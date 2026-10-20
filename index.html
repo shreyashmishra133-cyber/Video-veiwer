@@ -1,0 +1,1410 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>VideoVault — Personal Video Library</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2e;--panel2:#18233b;--text:#edf2ff;--muted:#a7b2cc;--accent:#8b7cff;--accent2:#55d6be;--border:#263452;--danger:#ff7185;--shadow:0 16px 45px #0004}
+[data-theme="light"]{color-scheme:light;--bg:#f4f6fb;--panel:#fff;--panel2:#eef1fb;--text:#17213a;--muted:#63708b;--accent:#6554e8;--accent2:#0b9f8b;--border:#dce2f0;--danger:#d93957;--shadow:0 12px 35px #28335a12}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 35%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--border);background:var(--panel2);color:var(--text);padding:10px 14px;border-radius:12px;transition:.18s}button:hover{transform:translateY(-1px);border-color:var(--accent)}button.primary{background:var(--accent);color:white;border-color:transparent;font-weight:700}button.ghost{background:transparent}button.danger{color:var(--danger)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:1250px;margin:auto;padding:24px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#4b8dff);font-size:24px;box-shadow:var(--shadow)}h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:-.8px}.subtitle{color:var(--muted);font-size:13px}.top-actions{display:flex;gap:9px;flex-wrap:wrap}
+.hero{padding:28px;border:1px solid var(--border);border-radius:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 18%,var(--panel)),var(--panel));display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap;margin-bottom:20px;box-shadow:var(--shadow)}.hero h2{font-size:clamp(22px,4vw,34px);line-height:1.15;margin:0 0 10px}.hero p{margin:0;color:var(--muted);max-width:580px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0 25px}.stat{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:25px;margin-top:3px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.field{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:11px 13px;border-radius:12px;min-width:0}.search{flex:1;min-width:190px}.toolbar select{min-width:140px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 15px}.section-head h2{font-size:20px;margin:0}.section-head span{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}.video-card{overflow:hidden;border:1px solid var(--border);background:var(--panel);border-radius:18px;transition:.2s;min-width:0}.video-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#26365a,#111a2e);position:relative;display:grid;place-items:center;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.thumb .play{position:absolute;width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:#0b1020bd;color:#fff;border:1px solid #ffffff60;font-size:18px;padding:0}.duration{position:absolute;right:8px;bottom:8px;background:#050914d9;color:#fff;padding:2px 6px;border-radius:6px;font-size:11px}.card-body{padding:12px}.video-info-row{display:flex;align-items:flex-start;gap:8px}.video-title{font-weight:700;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35;flex:1;min-width:0;margin:2px 0 5px}.video-menu-wrap{position:relative;flex:none}.video-menu-btn{width:36px;height:36px;padding:0;border:0;border-radius:50%;background:transparent;font-size:22px;line-height:1}.video-menu-btn:hover{background:var(--panel2);transform:none}.video-menu{position:absolute;right:0;top:35px;z-index:8;min-width:160px;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);display:none}.video-menu.open{display:grid;gap:3px}.video-menu button{width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:9px;white-space:nowrap}.video-menu button:hover{background:var(--panel2);transform:none}.video-menu button.liked{color:var(--accent2)}.video-card{position:relative}.thumb{cursor:pointer;border-radius:0}.thumb img{object-fit:cover}.meta{color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:8px}.card-actions{display:flex;gap:7px;margin-top:12px}.card-actions button{flex:1;padding:8px 7px;font-size:12px}
+.empty{border:1px dashed var(--border);background:color-mix(in srgb,var(--panel) 65%,transparent);padding:45px 20px;text-align:center;border-radius:20px}.empty .empty-icon{font-size:42px}.empty h3{margin:10px 0 5px}.empty p{color:var(--muted);max-width:470px;margin:0 auto 18px}.notice{margin-top:20px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:15px}
+.overlay{position:fixed;inset:0;background:#020613d9;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.overlay.show{display:flex}.modal{width:min(900px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 17px;border-bottom:1px solid var(--border)}.modal-head h3{margin:0;font-size:17px}.modal-content{padding:16px}.player{width:100%;max-height:68vh;background:#000;border-radius:12px}.detail-grid{display:grid;grid-template-columns:130px 1fr;gap:9px;font-size:14px}.detail-grid div:nth-child(odd){color:var(--muted)}.settings-list{display:grid;gap:13px}.setting{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px;border:1px solid var(--border);border-radius:14px}.setting small{display:block;color:var(--muted)}.setting select{max-width:180px}.toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--text);color:var(--bg);padding:11px 16px;border-radius:12px;z-index:20;transition:.2s;max-width:90vw;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}.hidden{display:none!important}
+
+.app{padding-bottom:112px}
+.bottom-taskbar{position:fixed;z-index:9;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(440px,calc(100% - 32px));height:72px;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:8px 14px;border:1px solid color-mix(in srgb,var(--border) 78%,transparent);border-radius:24px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 12px 38px #0004}
+.bottom-taskbar button{border:0;background:transparent;transform:none;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.bottom-taskbar button:hover{transform:none;color:var(--text);border-color:transparent}
+.taskbar-item{height:54px;flex-direction:column;gap:3px;padding:4px!important;font-size:11px}
+.taskbar-item svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.settings-emoji{display:block;font-size:23px;line-height:25px}
+.taskbar-add{justify-self:center;width:54px;height:54px;border-radius:18px!important;background:linear-gradient(135deg,var(--accent),#6d8cff)!important;color:#fff!important;box-shadow:0 7px 18px color-mix(in srgb,var(--accent) 38%,transparent);padding:0!important}
+.taskbar-add svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+@media(max-width:600px){.app{padding:15px;padding-bottom:112px}.hero{padding:20px}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:21px}.grid{grid-template-columns:minmax(0,1fr);gap:18px}.video-card{border-radius:16px}.thumb{aspect-ratio:16/9;border-radius:16px;}.card-body{padding:9px 3px 2px}.video-title{font-size:15px}.video-menu-btn{width:38px;height:34px}.top-actions button{padding:9px 10px}.detail-grid{grid-template-columns:100px 1fr}}
+
+/* Immersive video player controls */
+.player-modal{width:min(1100px,100%);max-height:96vh;background:#05070d;border:1px solid #ffffff22;overflow:hidden}
+.player-modal .modal-head{background:#101522;color:#fff;border-color:#ffffff18}
+.player-modal .modal-content{padding:0;position:relative;background:#000}
+.player-stage{position:relative;width:100%;height:min(76vh,760px);min-height:260px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;touch-action:none;user-select:none;-webkit-user-select:none}
+.player-stage video{display:block;flex:none;width:100%;height:100%;max-height:76vh;object-fit:contain;background:#000;transform-origin:center center;will-change:transform;pointer-events:none}
+.player-stage:fullscreen,.player-stage:-webkit-full-screen{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;min-height:0;max-height:none;border-radius:0}
+.player-stage:fullscreen video,.player-stage:-webkit-full-screen video{width:100%;height:100%;max-height:none}
+.player-dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:2}
+.player-hud{position:absolute;inset:0;z-index:4;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:14px;background:linear-gradient(#0008,transparent 24%,transparent 70%,#0009);opacity:1;transition:opacity .22s}
+.player-hud.hud-hidden{opacity:0;pointer-events:none}
+.player-hud-top{display:flex;align-items:center;justify-content:flex-start;gap:10px}
+.player-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.player-toggle{pointer-events:auto;width:66px;height:58px;border:1px solid #ffffff70;border-radius:16px;background:linear-gradient(145deg,#ffffff24,#ffffff08);color:#35e28a;font-size:29px;font-weight:800;display:grid;place-items:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 1px #ffffff35,0 8px 24px #0007;text-shadow:0 0 14px currentColor;transition:transform .15s ease,color .15s ease,background .15s ease}.player-toggle:active{transform:scale(.94)}.player-toggle.is-playing{color:#ff5364}.player-toggle.is-paused{color:#35e28a}
+.player-bottom{display:flex;align-items:center;gap:10px}
+.player-bottom button,.player-hud-top button{color:#fff;background:#101522bb;border:1px solid #ffffff2b;padding:8px 11px}
+.player-time{font-size:12px;white-space:nowrap}
+.player-seek{flex:1;min-width:40px;accent-color:#a99bff}
+/* Gesture feedback is intentionally frameless: only the meter and value appear. */
+.gesture-meter{position:absolute;z-index:5;top:50%;transform:translateY(-50%);display:none;align-items:center;gap:8px;padding:0;border:0;border-radius:0;background:transparent;color:#fff;min-width:0;text-shadow:0 1px 5px #000;pointer-events:none}
+.gesture-meter.visible{display:flex}
+.gesture-meter.left{left:16px;flex-direction:column}
+.gesture-meter.right{right:16px;flex-direction:column}
+.gesture-meter .meter-track{width:6px;height:112px;background:#ffffff45;border-radius:8px;position:relative;overflow:hidden;box-shadow:0 1px 5px #0008}
+.gesture-meter .meter-fill{position:absolute;bottom:0;left:0;right:0;background:#a99bff;border-radius:8px;height:50%;transition:height .035s linear}
+.gesture-meter .meter-icon{font-size:20px}
+.gesture-meter .meter-value{font-size:13px;font-weight:700;white-space:nowrap}
+.gesture-meter.speed{top:17%;left:50%;right:auto;transform:translateX(-50%);flex-direction:row;gap:10px}
+.gesture-meter.speed .meter-icon{font-size:22px}
+.gesture-meter.speed .meter-value{font-size:22px}
+.gesture-meter.speed .meter-label{font-size:12px;opacity:.9}
+.player-hint{font-size:11px;color:#ffffffb8;text-align:center}
+/* Fallback for browsers that fullscreen a div but cannot lock orientation. */
+#playerOverlay.pseudo-fullscreen{padding:0;align-items:stretch;justify-content:stretch;background:#000;z-index:30}
+#playerOverlay.pseudo-fullscreen .player-modal{width:100vw;height:100vh;height:100dvh;max-height:none;border:0;border-radius:0}
+#playerOverlay.pseudo-fullscreen .modal-head{display:none}
+#playerOverlay.pseudo-fullscreen .modal-content{height:100%;}
+#playerOverlay.pseudo-fullscreen .player-stage{width:100%;height:100vh;height:100dvh;min-height:0;max-height:none}
+#playerOverlay.pseudo-fullscreen .player-stage video{max-height:none}
+@media (orientation:portrait){
+ .player-stage.force-landscape:fullscreen,.player-stage.force-landscape:-webkit-full-screen,
+ #playerOverlay.pseudo-fullscreen .player-stage.force-landscape{
+  position:fixed!important;inset:auto!important;top:50%!important;left:50%!important;
+  width:100dvh!important;height:100vw!important;min-height:0!important;max-height:none!important;
+  transform:translate(-50%,-50%) rotate(90deg)!important;transform-origin:center center!important;z-index:99999!important;
+ }
+ .player-stage.force-landscape:fullscreen video,.player-stage.force-landscape:-webkit-full-screen video,
+ #playerOverlay.pseudo-fullscreen .player-stage.force-landscape video{width:100%;height:100%;max-height:none}
+}
+@media(max-width:600px){
+ .player-modal{width:100%;max-height:100dvh;border-radius:0}
+ .player-modal .modal-head{padding:10px 12px}
+ .player-stage{height:66vh;height:66dvh;min-height:230px}
+ .player-stage video{max-height:none}
+ .player-hud{padding:10px}
+ .player-toggle{width:60px;height:54px;border-radius:14px}
+ .player-bottom{gap:6px}
+ .player-bottom button{padding:7px 9px}
+}
+
+
+/* Refined VideoVault home layout */
+.app{max-width:1250px;margin:auto;padding:18px 22px 116px}
+.topbar{align-items:center;flex-wrap:nowrap;gap:12px;margin-bottom:14px}
+.brand{gap:10px;min-width:0}
+.logo{width:42px;height:42px;flex:0 0 42px;border-radius:14px;font-size:20px;box-shadow:0 7px 20px #0003}
+h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
+.subtitle{display:none}
+.top-actions{display:flex;align-items:center;gap:8px}
+.top-icon{display:grid;place-items:center;width:42px;height:42px;padding:0;border-radius:14px;background:color-mix(in srgb,var(--panel) 78%,transparent);border:1px solid var(--border)}
+.top-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hero,.stats{display:none!important}
+.toolbar{margin:0 0 20px;display:flex;gap:10px}
+.toolbar select,.toolbar #refreshBtn{display:none!important}
+.search{min-width:0;width:100%;height:49px;padding:12px 15px;border-radius:15px;background:color-mix(in srgb,var(--panel) 88%,transparent)}
+.section-head{margin:8px 0 15px}
+.bottom-taskbar{bottom:max(13px,env(safe-area-inset-bottom));width:min(420px,calc(100% - 28px));height:70px;padding:7px 12px;border-color:color-mix(in srgb,var(--border) 68%,transparent);border-radius:23px;background:color-mix(in srgb,var(--panel) 66%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 34px #0004,inset 0 1px 0 #ffffff16}
+.taskbar-item{font-size:10.5px;font-weight:650;gap:3px}
+.taskbar-item svg{width:24px;height:24px;stroke-width:1.9}.settings-emoji{font-size:25px;line-height:27px}
+.taskbar-add{width:52px;height:52px;border-radius:17px!important;box-shadow:0 7px 18px color-mix(in srgb,var(--accent) 38%,transparent),inset 0 1px 0 #ffffff40}
+@media(max-width:600px){.app{padding:14px 14px 116px}.top-icon{width:40px;height:40px}.logo{width:40px;height:40px;flex-basis:40px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-body{padding:10px}.card-actions{gap:5px}.card-actions button{font-size:11px;padding:8px 4px}}
+
+/* Smooth, transparent player controls: no backdrop-filter or animated drop-shadows over video */
+.player-hud{background:transparent;transition:opacity .12s linear;will-change:opacity}
+.player-hud>div:last-child{padding:5px 7px 6px;border-radius:12px;background:linear-gradient(180deg,transparent,#0009)}
+.player-toggle{position:relative;isolation:isolate;overflow:hidden;pointer-events:auto;flex:0 0 auto;width:66px;height:58px;padding:0!important;border:0!important;border-radius:16px;background:transparent!important;color:#fb923c;font-size:0;display:grid;place-items:center;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;text-shadow:none!important;transition:transform .12s ease,color .15s ease}
+.player-center{align-items:center;justify-content:center;pointer-events:none}
+.player-toggle::before{content:"";position:absolute;inset:0;z-index:-1;padding:1.7px;border-radius:inherit;background:linear-gradient(90deg,#7f1d1d,#991b1b,#b91c1c,#dc2626,#ea580c,#f97316,#fb923c,#fdba74,#fbbf24,#fef08a,#fbbf24,#fb923c,#ea580c,#b91c1c,#7f1d1d);background-size:280% 100%;background-position:0% 50%;animation:playerBorderRiver 5s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+@keyframes playerBorderRiver{to{background-position:280% 50%}}
+.player-toggle svg{display:block;width:27px;height:27px;margin:0;padding:0;fill:currentColor;stroke:none;pointer-events:none}
+.player-toggle.is-playing{color:#fb923c}.player-toggle.is-paused{color:#fbbf24}
+.player-toggle.is-energized{color:#fbbf24}
+.player-toggle:active{transform:scale(.97)}
+.player-toggle:hover{transform:none;border-color:transparent!important}
+.player-bottom{display:flex;align-items:center;gap:9px}
+.player-bottom button{display:none!important}
+.player-time{font-size:12px;font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap;text-shadow:0 1px 3px #000}
+.player-seek{--progress:0%;appearance:none;-webkit-appearance:none;flex:1;min-width:40px;height:8px;margin:0;padding:0;border:1px solid #ffffff25;border-radius:999px;outline:none;background-image:linear-gradient(to right,transparent 0 var(--progress),rgba(8,12,22,.8) var(--progress) 100%),linear-gradient(90deg,#7f1d1d,#b91c1c,#dc2626,#ea580c,#f97316,#fb923c,#fdba74,#fbbf24,#fef08a,#fbbf24,#fb923c,#ea580c,#b91c1c,#7f1d1d);background-size:100% 100%,260% 100%;background-position:0 0,0% 50%;background-repeat:no-repeat;animation:seekRiverFlow 6s linear infinite;cursor:pointer;box-shadow:inset 0 1px 2px #0007}
+@keyframes seekRiverFlow{from{background-position:0 0,0% 50%}to{background-position:0 0,260% 50%}}
+.player-seek::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;border:2px solid #fff9;background:#fb923c;box-shadow:0 0 0 2px #f9731630}
+.player-seek::-moz-range-thumb{width:11px;height:11px;border-radius:50%;border:2px solid #fff9;background:#fb923c;box-shadow:0 0 0 2px #f9731630}
+.player-seek:focus-visible{outline:1px solid #fdba74;outline-offset:4px}
+.gesture-meter .meter-track{background:#ffffff34;border:1px solid #ffffff22;box-shadow:none}
+.gesture-meter .meter-fill{background:linear-gradient(180deg,#7f1d1d,#b91c1c,#dc2626,#ea580c,#f97316,#fb923c,#fdba74,#fbbf24,#fef08a,#fbbf24,#fb923c,#ea580c);background-size:100% 260%;animation:meterRiverFlow 2.8s linear infinite;will-change:background-position}
+@keyframes meterRiverFlow{from{background-position:0 0}to{background-position:0 260%}}
+.skip-feedback{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%) scale(.97);display:flex;align-items:center;gap:8px;min-width:112px;padding:10px 13px;border:1px solid #ffffff24;border-radius:16px;background:#030712b8;color:white;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s linear,transform .12s ease;will-change:opacity,transform}
+.skip-feedback.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.skip-arrow-wrap{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#ffffff15;color:#fdba74}
+.skip-arrow{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.skip-feedback.backward .skip-arrow{transform:scaleX(-1)}
+.skip-copy{display:flex;flex-direction:column;gap:0;line-height:1.25;white-space:nowrap}
+.skip-copy strong{font-size:14px;font-weight:750}.skip-copy small{font-size:10px;color:#ffffffb8}
+.player-hint{font-size:10px;opacity:.75}
+.player-hud.hud-hidden .player-seek,.player-hud.hud-hidden .player-toggle::before{animation-play-state:paused}
+@media(max-width:600px){.player-modal{width:100%;max-height:100dvh;border-radius:0}.player-modal .modal-head{padding:10px 12px}.player-stage{height:66vh;height:66dvh;min-height:230px}.player-hud{padding:10px}.player-toggle{width:60px;height:54px;border-radius:14px}.player-toggle svg{width:26px;height:26px}.player-bottom{gap:6px}.player-time{font-size:11px}.player-hint{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.player-toggle::before,.player-seek,.gesture-meter .meter-fill{animation:none!important}}
+
+
+/* Final responsive library layout */
+.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:22px}
+@media(max-width:600px){.grid{grid-template-columns:minmax(0,1fr);gap:22px}.video-card{border:0;border-radius:0;background:transparent;box-shadow:none}.video-card:hover{transform:none}.thumb{aspect-ratio:16/9;border-radius:12px}.card-body{padding:9px 2px 2px}.video-title{font-size:15px}}
+/* Immersive video-only player: preserve native video ratio and remove the oversized header/frame */
+#playerOverlay{padding:12px;background:rgba(8,11,25,.40);backdrop-filter:blur(16px) saturate(112%);-webkit-backdrop-filter:blur(16px) saturate(112%);overscroll-behavior:contain}
+#playerOverlay .player-modal{width:auto;max-width:none;max-height:none;overflow:visible;background:transparent;border:0;border-radius:0;box-shadow:none}
+#playerOverlay .player-modal>.modal-head{display:none!important}
+#playerOverlay .player-modal>.modal-content{padding:0;background:transparent;overflow:visible}
+#playerOverlay .player-stage{width:min(calc(100vw - 24px),1100px);height:auto;aspect-ratio:16/9;min-height:0;max-height:calc(100dvh - 24px);background:transparent;border:0;border-radius:14px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.18);touch-action:pan-y;contain:layout paint style}
+#playerOverlay .player-stage video{display:block;width:100%;height:100%;max-height:none;object-fit:contain;background:transparent;pointer-events:none;will-change:auto}
+#playerOverlay .player-hud{padding:10px;background:linear-gradient(180deg,rgba(0,0,0,.20),transparent 20%,transparent 76%,rgba(0,0,0,.38));transition:opacity .12s linear;will-change:opacity}
+#playerOverlay .player-hud-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#playerOverlay .player-hud-top button{width:42px;height:42px;display:grid;place-items:center;padding:0;border-radius:13px;background:rgba(16,21,34,.58);border:1px solid rgba(255,255,255,.25);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 4px 12px rgba(0,0,0,.16);color:#fff}
+#playerOverlay #playerFullscreen{font-size:27px;color:#eee9ff}
+#playerOverlay #closePlayerFloat{position:relative;isolation:isolate;overflow:hidden;color:#ff5c63;border:0;background:linear-gradient(145deg,rgba(28,11,20,.82),rgba(14,12,28,.78));box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);font-size:0}
+#playerOverlay #closePlayerFloat:before{content:"";position:absolute;inset:0;padding:1.7px;border-radius:inherit;background:linear-gradient(125deg,#dc2626,#f97316,#fbbf24,#f43f5e,#a855f7,#dc2626);background-size:100% 100%;animation:none!important;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+#playerOverlay #closePlayerFloat svg{width:21px;height:21px;stroke:currentColor;stroke-width:2.8;fill:none;stroke-linecap:round;pointer-events:none}
+#playerOverlay .player-center{pointer-events:none}
+#playerOverlay .player-toggle{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important;transition:opacity .12s linear;will-change:auto}
+#playerOverlay .player-toggle:before{animation:none!important;background-size:100% 100%;background-position:50% 50%}
+#playerOverlay .player-seek{animation:none!important;background-size:100% 100%,100% 100%;background-position:0 0,50% 50%;box-shadow:none}
+#playerOverlay .gesture-meter .meter-fill{animation:none!important;background-size:100% 100%;background-position:50% 50%;transition:none}
+#playerOverlay .gesture-meter .meter-track{box-shadow:none}
+#playerOverlay .player-hint{display:none!important}
+#playerOverlay .player-bottom{gap:8px}
+#playerOverlay .player-time{text-shadow:0 1px 3px #000}
+#playerOverlay .skip-feedback{box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+#playerOverlay.pseudo-fullscreen{padding:0;background:#000;backdrop-filter:none;-webkit-backdrop-filter:none}
+#playerOverlay.pseudo-fullscreen .player-modal{width:100vw;height:100dvh}
+#playerOverlay.pseudo-fullscreen .player-stage{width:100vw!important;height:100dvh!important;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none}
+#playerOverlay .player-stage:fullscreen,#playerOverlay .player-stage:-webkit-full-screen{width:100vw!important;height:100dvh!important;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none;background:#000}
+#playerOverlay .player-stage:fullscreen video,#playerOverlay .player-stage:-webkit-full-screen video{height:100%;max-height:none}
+@media(max-width:600px){
+ #playerOverlay{padding:10px}
+ #playerOverlay .player-stage{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:12px}
+ #playerOverlay .player-hud{padding:8px}
+ #playerOverlay .player-hud-top button{width:40px;height:40px;border-radius:12px}
+}
+@media(prefers-reduced-motion:reduce){#playerOverlay *{animation:none!important;transition:none!important}}
+/* Full-screen, soft-glass Settings panel */
+.settings-overlay{padding:0;align-items:stretch;justify-content:stretch;background:rgba(6,10,25,.42);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:30}
+.settings-modal{width:100%;height:100vh;height:100dvh;max-height:none;overflow:auto;border:0;border-radius:0;background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--accent) 19%,transparent),transparent 42%),radial-gradient(ellipse at 100% 40%,rgba(225,111,156,.09),transparent 38%),var(--bg);scrollbar-width:thin}
+.settings-header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:calc(18px + env(safe-area-inset-top)) max(18px,calc((100% - 720px)/2)) 18px;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--panel) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.settings-heading{display:flex;align-items:center;gap:13px;min-width:0}.settings-header-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border-radius:15px;background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 25%,var(--panel)),rgba(85,159,255,.16));border:1px solid color-mix(in srgb,var(--accent) 34%,var(--border));font-size:25px;color:var(--accent)}.settings-heading h2{font-size:clamp(22px,4vw,29px);letter-spacing:-.5px;margin:0;line-height:1.2}.settings-heading p{margin:4px 0 0;color:var(--muted);font-size:13px}.settings-close{display:flex;align-items:center;gap:7px;flex:none;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 88%,transparent);padding:10px 12px;border-radius:13px}
+.settings-content{width:min(100%,720px);margin:0 auto;padding:28px 18px calc(34px + env(safe-area-inset-bottom));display:grid;gap:22px}
+.setting-card{position:relative;display:flex;align-items:center;gap:15px;padding:20px;border:1px solid color-mix(in srgb,var(--border) 82%,var(--accent));border-radius:23px;background:linear-gradient(135deg,color-mix(in srgb,var(--panel) 91%,var(--accent) 9%),color-mix(in srgb,var(--panel) 96%,#e478a0 4%));box-shadow:0 14px 34px rgba(3,8,25,.13),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);min-width:0}
+.setting-card:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:0 8px 8px 0;background:linear-gradient(180deg,var(--accent),#e77ca0);opacity:.9}
+.setting-card-icon{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:15px;font-size:25px;border:1px solid color-mix(in srgb,var(--accent) 25%,var(--border));background:color-mix(in srgb,var(--accent) 13%,var(--panel));color:var(--accent)}
+.insert-icon{color:var(--accent2);background:color-mix(in srgb,var(--accent2) 12%,var(--panel));border-color:color-mix(in srgb,var(--accent2) 25%,var(--border))}
+.clear-icon{color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,var(--panel));border-color:color-mix(in srgb,var(--danger) 22%,var(--border))}
+.setting-card-copy{flex:1;min-width:0}.setting-card-copy h3{font-size:17px;margin:0 0 5px;letter-spacing:-.2px}.setting-card-copy p{font-size:13px;line-height:1.5;color:var(--muted);margin:0}.theme-status{display:inline-flex;align-items:center;margin-top:10px;font-size:12px;font-weight:650;color:var(--accent2)}
+.settings-action{flex:none;min-width:90px;padding:11px 14px;border-radius:13px;font-weight:700}.settings-action.primary{background:linear-gradient(135deg,var(--accent),#6489ff);box-shadow:0 7px 18px color-mix(in srgb,var(--accent) 27%,transparent)}
+.danger-fill{border:1px solid color-mix(in srgb,var(--danger) 35%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--danger) 22%,var(--panel)),color-mix(in srgb,var(--danger) 11%,var(--panel)));color:var(--danger);font-weight:750}
+.theme-switch{width:58px;height:34px;flex:0 0 58px;padding:3px;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 36%,var(--border));background:var(--panel2);box-shadow:inset 0 2px 5px #0002;display:flex;align-items:center;justify-content:flex-start;transition:background .18s,border-color .18s}.theme-switch span{display:block;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fff,#dfe8ff);box-shadow:0 2px 8px #0003;transition:transform .18s}.theme-switch.is-on{background:linear-gradient(100deg,#5c57bd,#5a91df);border-color:#7985e5}.theme-switch.is-on span{transform:translateX(23px);background:linear-gradient(135deg,#fff,#d4e8ff)}
+.settings-footnote{font-size:12px;line-height:1.6;color:var(--muted);text-align:center;margin:0 7px;padding:6px 12px 0}
+.confirm-overlay{z-index:45;background:rgba(7,10,22,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.confirm-modal{width:min(440px,100%);max-height:calc(100dvh - 34px);padding:25px;border-radius:25px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 92%,var(--accent) 8%),var(--panel));border-color:color-mix(in srgb,var(--danger) 25%,var(--border));text-align:left}
+.confirm-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;color:var(--danger);font-weight:900;font-size:27px;background:color-mix(in srgb,var(--danger) 13%,var(--panel));border:1px solid color-mix(in srgb,var(--danger) 22%,var(--border));margin-bottom:14px}.confirm-modal h2{margin:0 0 8px;font-size:23px}.confirm-description{color:var(--muted);font-size:14px;margin:0 0 20px;line-height:1.6}.confirm-modal label{display:block;font-size:13px;margin-bottom:8px}.confirm-input{width:100%;min-width:0;display:block;font-size:16px;padding:13px 14px}.confirm-hint{display:block;margin-top:9px;color:var(--muted);font-size:12px;line-height:1.5}.confirm-error{display:block;margin-top:7px;color:var(--danger);font-weight:650;font-size:12px;min-height:0}.confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:21px}.confirm-actions button{min-width:100px;padding:11px 15px}.cancel-action{background:transparent}.confirm-actions .danger-fill{background:linear-gradient(135deg,color-mix(in srgb,var(--danger) 22%,var(--panel)),color-mix(in srgb,var(--danger) 9%,var(--panel)))}
+[data-theme="light"] .setting-card{background:linear-gradient(135deg,#ffffffef,#f4f3ffdf 58%,#fff1f6dd);box-shadow:0 14px 30px #34436e12,inset 0 1px 0 #fff}
+[data-theme="light"] .settings-modal{background:radial-gradient(ellipse at 0 0,#8176e826,transparent 43%),radial-gradient(ellipse at 100% 35%,#e8759d1b,transparent 36%),#f5f6fc}
+@media(max-width:520px){.settings-header{padding-left:15px;padding-right:15px}.settings-heading{gap:10px}.settings-header-icon{width:42px;height:42px;flex-basis:42px}.settings-heading h2{font-size:23px}.settings-heading p{font-size:11px}.settings-close{padding:9px 10px}.settings-close span{display:none}.settings-content{padding:20px 13px calc(25px + env(safe-area-inset-bottom));gap:18px}.setting-card{padding:17px 14px;gap:11px;border-radius:20px}.setting-card-icon{width:42px;height:42px;flex-basis:42px}.setting-card-copy h3{font-size:15px}.setting-card-copy p{font-size:12px}.theme-switch{width:52px;height:31px;flex-basis:52px}.theme-switch span{width:23px;height:23px}.theme-switch.is-on span{transform:translateX(21px)}.settings-action{min-width:0;padding:10px 11px;font-size:12px}.confirm-modal{padding:21px;border-radius:22px}.confirm-actions button{min-width:88px}}
+
+
+
+/* Paste/search link bar and online-video result */
+.link-search-wrap{display:flex;align-items:center;gap:8px;width:100%;min-width:0;margin:-8px 0 20px;padding:4px 5px 4px 15px;border:1px solid var(--border);border-radius:17px;background:color-mix(in srgb,var(--panel) 90%,transparent);box-shadow:inset 0 1px 0 #ffffff08;}
+.link-search-input{display:block;flex:1;min-width:0;width:100%;height:42px;padding:9px 2px;border:0;outline:none!important;border-radius:0;background:transparent;color:var(--text);font:inherit;box-shadow:none!important;}
+.link-search-input::placeholder{color:var(--muted);opacity:.88}
+.link-search-action{flex:none;min-width:82px;height:40px;padding:8px 13px;border:0;border-radius:12px;background:#dc2626;color:#fff;font-weight:800;letter-spacing:.1px;box-shadow:0 3px 9px #0002;transition:background .16s,transform .16s;}
+.link-search-action:hover{transform:translateY(-1px);border-color:transparent}
+.link-search-action.search-ready{background:#16a34a;color:#fff}
+.link-search-action:disabled{opacity:.65;cursor:wait;transform:none}
+.link-result-section{margin:-3px 0 22px}
+.link-result-section .section-head{margin-top:0}
+.link-result-card{min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:17px;background:var(--panel);cursor:pointer;transition:border-color .15s,transform .15s;outline:none}.link-result-card:hover,.link-result-card:focus-visible{border-color:var(--accent);transform:translateY(-1px)}.link-result-card:active{transform:scale(.995)}
+.link-result-thumb{position:relative;display:grid;place-items:center;overflow:hidden;aspect-ratio:16/9;background:linear-gradient(135deg,#28375c,#111a2e);color:#fff}
+.link-result-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.link-result-thumb .link-thumb-overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(transparent,#0004)}
+.link-result-thumb .link-thumb-overlay span{display:grid;place-items:center;width:48px;height:48px;border:1px solid #ffffff70;border-radius:50%;background:#050914bb;color:white;font-size:20px}
+.link-result-body{padding:12px}
+.link-result-title{margin:0 0 5px;font-size:15px;line-height:1.4;font-weight:750;overflow-wrap:anywhere}
+.link-result-note{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.link-result-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.link-result-actions button,.link-result-actions a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 12px;border-radius:11px;text-decoration:none;font:inherit;font-size:12px;font-weight:750}
+.link-result-actions .link-play-action{background:var(--accent);color:#fff;border:1px solid transparent}
+.link-result-actions .link-open-action{border:1px solid var(--border);background:transparent;color:var(--text)}
+#playerStage .external-player{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;border:0;background:#000;transform-origin:center center;pointer-events:none}
+#playerStage iframe.external-player{max-width:none}
+@media(max-width:600px){.link-search-wrap{margin:-5px 0 18px;padding-left:12px;border-radius:16px;gap:6px}.link-search-input{font-size:14px}.link-search-action{min-width:76px;padding:8px 11px;border-radius:11px}.link-result-body{padding:10px}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo" aria-hidden="true">▶</div><div><h1>VideoVault</h1><div class="subtitle">आपकी अपनी वीडियो लाइब्रेरी</div></div></div>
+  </header>
+
+  <section class="hero">
+    <div><h2>आपके वीडियो।<br><span style="color:var(--accent)">एक ही जगह।</span></h2><p>लोकल वीडियो कलेक्शन को व्यवस्थित करें, खोजें और ब्राउज़र में चलाएँ। आपकी लाइब्रेरी इसी ब्राउज़र में सेव रहती है।</p></div>
+    <div class="hero-actions"><button class="primary" id="heroAdd">＋ वीडियो इम्पोर्ट करें</button><button id="importListBtn">↥ लाइब्रेरी बैकअप इम्पोर्ट</button></div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><small>कुल वीडियो</small><strong id="totalCount">0</strong></div>
+    <div class="stat"><small>कुल साइज़</small><strong id="totalSize">0 MB</strong></div>
+    <div class="stat"><small>हाल ही में जोड़े</small><strong id="recentCount">0</strong></div>
+  </section>
+
+  <div class="toolbar">
+    <input class="field search" id="searchInput" type="search" placeholder="🔎 वीडियो का नाम खोजें…" aria-label="वीडियो खोजें">
+    <select class="field" id="sortSelect" aria-label="सॉर्ट करें"><option value="newest">नए पहले</option><option value="oldest">पुराने पहले</option><option value="name">नाम A–Z</option><option value="size">सबसे बड़े पहले</option><option value="duration">लंबी अवधि पहले</option></select>
+    <button id="refreshBtn">↻ रिफ्रेश</button>
+  </div>
+
+  <form class="link-search-wrap" id="linkSearchForm" role="search" autocomplete="off">
+    <input class="link-search-input" id="linkInput" type="url" inputmode="url" placeholder="YouTube, Instagram या वीडियो लिंक पेस्ट करें…" aria-label="वीडियो लिंक" spellcheck="false">
+    <button class="link-search-action" id="linkActionBtn" type="button" aria-label="क्लिपबोर्ड से लिंक पेस्ट करें">Paste</button>
+  </form>
+  <section class="link-result-section hidden" id="linkResultSection" aria-live="polite">
+    <div class="section-head"><h2>लिंक से वीडियो</h2><span id="linkResultStatus"></span></div>
+    <div class="grid" id="linkedVideoGrid"></div>
+  </section>
+
+  <div class="section-head"><h2>मेरी लाइब्रेरी</h2><span id="resultLabel">0 वीडियो</span></div>
+  <div class="grid" id="videoGrid"></div>
+  <div class="empty" id="emptyState"><div class="empty-icon">🎬</div><h3 id="emptyTitle">आपकी लाइब्रेरी अभी खाली है</h3><p id="emptyText">अपनी डिवाइस से वीडियो चुनें। वीडियो इस ब्राउज़र में सेव करने की कोशिश की जाएगी, ताकि अगली बार भी आपकी लाइब्रेरी उपलब्ध रहे।</p><button class="primary" id="emptyAdd">पहला वीडियो जोड़ें</button></div>
+  <div class="notice">🔒 प्राइवेसी: यह पेज वीडियो किसी सर्वर पर अपलोड नहीं करता। डेटा इसी ब्राउज़र के लोकल स्टोरेज में रखा जाता है। ब्राउज़र डेटा हटाने पर लाइब्रेरी भी हट सकती है।</div>
+</div>
+
+<nav class="bottom-taskbar" aria-label="मुख्य नेविगेशन">
+  <button class="taskbar-item home-item" id="homeBtn" aria-label="होम" title="होम">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 9.7V20h5.2v-5.8h2.6V20h5.2V9.7"/><path d="M2.8 11 12 3.7 21.2 11"/></svg>
+    <span>होम</span>
+  </button>
+  <button class="taskbar-add" id="addBtn" aria-label="वीडियो जोड़ें" title="गैलरी से वीडियो जोड़ें">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>
+  </button>
+  <button class="taskbar-item settings-item" id="settingsBtn" aria-label="सेटिंग्स" title="सेटिंग्स">
+    <span class="settings-emoji" aria-hidden="true">⚙️</span>
+    <span>सेटिंग्स</span>
+  </button>
+</nav>
+
+<input id="videoPicker" type="file" accept="video/*" multiple class="hidden">
+<input id="backupPicker" type="file" accept="application/json,.json" class="hidden">
+
+<div class="overlay" id="playerOverlay" role="dialog" aria-modal="true" aria-label="वीडियो प्लेयर">
+ <div class="modal player-modal">
+  <div class="modal-content">
+   <div class="player-stage" id="playerStage">
+    <video id="videoPlayer" playsinline preload="metadata"></video>
+    <div class="player-dim" id="playerDim"></div>
+    <div class="skip-feedback" id="skipFeedback" aria-hidden="true"><span class="skip-arrow-wrap"><svg viewBox="0 0 24 24" class="skip-arrow" aria-hidden="true"><path d="M3 5.5 9.5 12 3 18.5"/><path d="M10 5.5 16.5 12 10 18.5"/><path d="M16.5 12H21"/></svg></span><span class="skip-copy"><strong id="skipAmount">10 सेकंड</strong><small id="skipDirectionText">आगे</small></span></div>
+    <div class="gesture-meter left" id="brightnessMeter"><span class="meter-icon">☀</span><span class="meter-track"><span class="meter-fill" id="brightnessFill"></span></span><span id="brightnessValue">100%</span></div>
+    <div class="gesture-meter right" id="volumeMeter"><span class="meter-icon">🔊</span><span class="meter-track"><span class="meter-fill" id="volumeFill"></span></span><span class="meter-value" id="volumeValue">100%</span></div>
+    <div class="gesture-meter speed" id="speedMeter"><span class="meter-icon">⏩</span><span class="meter-label">स्पीड</span><span class="meter-value" id="speedValue">1×</span></div>
+    <div class="player-hud" id="playerHud">
+     <div class="player-hud-top">
+      <button id="playerFullscreen" aria-label="फुल स्क्रीन" title="फुल स्क्रीन">⛶</button>
+      <button id="closePlayerFloat" aria-label="वीडियो बंद करें" title="वीडियो बंद करें"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
+     </div>
+     <div class="player-center"><button class="player-toggle is-playing" id="playPauseBtn" aria-label="पॉज़ करें"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.1 5.8Q8.1 4.8 9.1 5.4L18.2 11.4Q19.2 12 18.2 12.6L9.1 18.6Q8.1 19.2 8.1 18.2Z"/></svg></button></div>
+     <div>
+      <div class="player-bottom">
+       <span class="player-time" id="currentTime">0:00</span>
+       <input class="player-seek" id="seekSlider" type="range" min="0" max="1000" value="0" aria-label="वीडियो की स्थिति">
+       <span class="player-time" id="durationTime">0:00</span>
+      </div>
+      <div class="player-hint">डबल टैप: ±10 सेकंड · नीचे स्वाइप: ±10 सेकंड · बाएँ ऊपर/नीचे: ब्राइटनेस · दाएँ ऊपर/नीचे: वॉल्यूम · ऊपर स्वाइप: स्पीड · पिंच: ज़ूम, ड्रैग: पैन</div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-label="वीडियो जानकारी">
+ <div class="modal" style="max-width:520px"><div class="modal-head"><h3>वीडियो जानकारी</h3><button id="closeDetail">✕</button></div><div class="modal-content" id="detailContent"></div></div>
+</div>
+
+<div class="overlay settings-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-label="सेटिंग्स">
+ <div class="modal settings-modal">
+  <div class="settings-header"><div class="settings-heading"><span class="settings-header-icon" aria-hidden="true">⚙</span><div><h2>Settings</h2><p>अपनी VideoVault को अपने अनुसार बनाएँ</p></div></div><button id="closeSettings" class="settings-close" aria-label="सेटिंग्स बंद करें">✕ <span>बंद करें</span></button></div>
+  <div class="settings-content">
+   <section class="setting-card theme-card" aria-labelledby="themeTitle">
+    <div class="setting-card-icon theme-icon" aria-hidden="true">◐</div>
+    <div class="setting-card-copy"><h3 id="themeTitle">Theme</h3><p>Dark Theme सक्षम करें या आरामदायक Light Mode चुनें।</p><span id="themeStatus" class="theme-status">Dark Theme चालू है</span></div>
+    <button id="themeToggle" class="theme-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Dark Theme चालू या बंद करें"><span></span></button>
+   </section>
+   <section class="setting-card action-card" aria-labelledby="insertTitle">
+    <div class="setting-card-icon insert-icon" aria-hidden="true">＋</div>
+    <div class="setting-card-copy"><h3 id="insertTitle">Insert Video</h3><p>अपने मोबाइल से नए वीडियो चुनकर लाइब्रेरी में जोड़ें।</p></div>
+    <button id="settingsInsertBtn" class="settings-action primary">＋ Insert</button>
+   </section>
+   <section class="setting-card clear-card" aria-labelledby="clearTitle">
+    <div class="setting-card-icon clear-icon" aria-hidden="true">⌫</div>
+    <div class="setting-card-copy"><h3 id="clearTitle">Clear All Your Data</h3><p>लाइब्रेरी के सभी वीडियो रिकॉर्ड और ऐप में सेव वीडियो फ़ाइलें हटाएँ। यह कार्रवाई वापस नहीं की जा सकती।</p></div>
+    <button id="clearBtn" class="settings-action danger-fill">Clear All</button>
+   </section>
+   <p class="settings-footnote">Clear All केवल इस ऐप की लोकल लाइब्रेरी साफ़ करता है। आपके डिवाइस में अलग से सेव मूल वीडियो फ़ाइलें नहीं मिटेंगी।</p>
+  </div>
+ </div>
+</div>
+<div class="overlay confirm-overlay" id="clearConfirmOverlay" role="dialog" aria-modal="true" aria-labelledby="clearConfirmTitle" aria-describedby="clearConfirmHint">
+ <div class="modal confirm-modal">
+  <div class="confirm-mark" aria-hidden="true">!</div><h2 id="clearConfirmTitle">Clear All</h2>
+  <p class="confirm-description">क्या आप सचमुच अपनी VideoVault लाइब्रेरी का सारा डेटा हटाना चाहते हैं? इसे वापस नहीं लाया जा सकेगा।</p>
+  <form id="clearConfirmForm" novalidate>
+   <label for="clearConfirmInput">पुष्टि के लिए <strong>Delete</strong> लिखें</label>
+   <input id="clearConfirmInput" class="field confirm-input" type="text" placeholder="यहाँ Delete टाइप करें" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="clearConfirmHint clearConfirmError">
+   <small id="clearConfirmHint" class="confirm-hint">बिल्कुल यही लिखें: Delete (D बड़ा, बाकी अक्षर छोटे; कोई स्पेस नहीं)</small>
+   <small id="clearConfirmError" class="confirm-error" role="alert"></small>
+   <div class="confirm-actions"><button type="button" id="cancelClearBtn" class="cancel-action">Cancel</button><button type="submit" class="danger-fill" id="confirmClearBtn">OK, Delete</button></div>
+  </form>
+ </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const DB_KEY = 'videovault-library-v1';
+  let videos = [];
+  let activeUrl = null;
+  let activeExternal = null;
+  let linkedMedia = null;
+  let ytPlayer = null;
+  let ytState = -1;
+  let youtubeApiPromise = null;
+  let externalUiTimer = null;
+  let toastTimer;
+  const dbSupported = 'indexedDB' in window;
+  let db = null;
+
+  function notify(message) {
+    $('toast').textContent = message;
+    $('toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2800);
+  }
+  function fmtBytes(bytes=0) {
+    if (!bytes) return '0 MB';
+    const units = ['B','KB','MB','GB','TB'];
+    const i = Math.min(Math.floor(Math.log(bytes)/Math.log(1024)), units.length-1);
+    return (bytes/Math.pow(1024,i)).toFixed(i < 2 ? 0 : 1) + ' ' + units[i];
+  }
+  function fmtDuration(sec=0) {
+    if (!Number.isFinite(sec) || sec <= 0) return '—';
+    sec = Math.floor(sec);
+    const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+    return h ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
+  }
+  function esc(s='') { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      if (!dbSupported) return reject(new Error('IndexedDB not supported'));
+      const req = indexedDB.open('VideoVaultDB', 1);
+      req.onupgradeneeded = () => {
+        const d = req.result;
+        if (!d.objectStoreNames.contains('files')) d.createObjectStore('files', {keyPath:'id'});
+      };
+      req.onsuccess = () => { db = req.result; resolve(db); };
+      req.onerror = () => reject(req.error);
+    });
+  }
+  function storeFile(record) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files','readwrite');
+      tx.objectStore('files').put(record);
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+    });
+  }
+  function getFile(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files','readonly'), req = tx.objectStore('files').get(id);
+      req.onsuccess = () => resolve(req.result || null); req.onerror = () => reject(req.error);
+    });
+  }
+  function deleteFile(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files','readwrite'); tx.objectStore('files').delete(id);
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+    });
+  }
+  function readMetadata(file) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file), v = document.createElement('video');
+      v.preload = 'metadata'; v.muted = true; v.src = url;
+      const done = (duration=0, width=0, height=0) => {
+        URL.revokeObjectURL(url); v.removeAttribute('src'); v.load();
+        resolve({duration: Number.isFinite(duration) ? duration : 0, width, height});
+      };
+      v.onloadedmetadata = () => done(v.duration, v.videoWidth, v.videoHeight);
+      v.onerror = () => done();
+      setTimeout(() => { if (v.readyState < 1) done(); }, 8000);
+    });
+  }
+  function getThumb(file) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file), v = document.createElement('video');
+      v.preload = 'metadata'; v.muted = true; v.src = url;
+      const cleanup = () => { URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); };
+      v.onloadedmetadata = () => { try { v.currentTime = Math.min(0.15, Math.max(0, v.duration/100 || 0)); } catch(e) { cleanup(); resolve(''); } };
+      v.onseeked = () => {
+        try {
+          const c = document.createElement('canvas'); c.width = 320; c.height = 180;
+          const ctx = c.getContext('2d'); const scale = Math.max(320/(v.videoWidth||320),180/(v.videoHeight||180));
+          const w=(v.videoWidth||320)*scale,h=(v.videoHeight||180)*scale;
+          ctx.drawImage(v,(320-w)/2,(180-h)/2,w,h);
+          const data = c.toDataURL('image/jpeg', .72); cleanup(); resolve(data);
+        } catch(e) { cleanup(); resolve(''); }
+      };
+      v.onerror = () => { cleanup(); resolve(''); };
+      setTimeout(() => { cleanup(); resolve(''); }, 9000);
+    });
+  }
+  async function loadRecords() {
+    try {
+      const raw = localStorage.getItem(DB_KEY);
+      videos = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(videos)) videos = [];
+    } catch(e) { videos = []; }
+  }
+  function saveRecords() {
+    try { localStorage.setItem(DB_KEY, JSON.stringify(videos)); return true; }
+    catch(e) { notify('ब्राउज़र स्टोरेज भर गया है। कुछ वीडियो हटाएँ या बैकअप लें।'); return false; }
+  }
+  function stats() {
+    $('totalCount').textContent = videos.length;
+    $('totalSize').textContent = fmtBytes(videos.reduce((s,v)=>s+(v.size||0),0));
+    const cutoff = Date.now() - 7*86400000;
+    $('recentCount').textContent = videos.filter(v=>(v.addedAt||0)>=cutoff).length;
+  }
+  function render() {
+    stats();
+    const q = $('searchInput').value.trim().toLowerCase(), sort = $('sortSelect').value;
+    let list = videos.filter(v => v.name.toLowerCase().includes(q));
+    list.sort((a,b) => sort==='oldest' ? a.addedAt-b.addedAt : sort==='name' ? a.name.localeCompare(b.name) : sort==='size' ? b.size-a.size : sort==='duration' ? b.duration-a.duration : b.addedAt-a.addedAt);
+    $('resultLabel').textContent = `${list.length} वीडियो`;
+    $('videoGrid').innerHTML = list.map(v => `
+      <article class="video-card">
+        <div class="thumb" data-play="${v.id}" role="button" tabindex="0" aria-label="${esc(v.name)} चलाएँ">${v.thumb ? `<img src="${v.thumb}" alt="${esc(v.name)} का थंबनेल">` : '<span style="font-size:38px">🎞️</span>'}<button class="play" data-play="${v.id}" aria-label="वीडियो चलाएँ">▶</button><span class="duration">${fmtDuration(v.duration)}</span></div>
+        <div class="card-body"><div class="video-info-row"><div class="video-title" title="${esc(v.name)}">${esc(v.name)}</div><div class="video-menu-wrap"><button class="video-menu-btn" data-menu="${v.id}" aria-label="वीडियो विकल्प" aria-expanded="false">⋮</button><div class="video-menu" id="menu-${v.id}"><button data-play="${v.id}">▶ &nbsp; Play</button><button class="${v.liked ? 'liked' : ''}" data-like="${v.id}">${v.liked ? '♥' : '♡'} &nbsp; ${v.liked ? 'Liked' : 'Like'}</button><button data-info="${v.id}">ⓘ &nbsp; Information</button><button class="danger" data-delete="${v.id}">▱ &nbsp; Remove</button></div></div></div><div class="meta"><span>${fmtBytes(v.size)}</span><span>${v.width&&v.height ? `${v.width}×${v.height}` : 'वीडियो'}</span></div></div>
+      </article>`).join('');
+    $('emptyState').classList.toggle('hidden', list.length !== 0);
+    if (!videos.length) { $('emptyTitle').textContent = 'आपकी लाइब्रेरी अभी खाली है'; $('emptyText').textContent = 'अपनी डिवाइस से वीडियो चुनें। इस ब्राउज़र में उपलब्ध स्टोरेज के अनुसार वीडियो सेव होंगे।'; }
+    else { $('emptyTitle').textContent = 'कोई वीडियो नहीं मिला'; $('emptyText').textContent = 'दूसरा नाम खोजें या सर्च बॉक्स साफ़ करें।'; }
+  }
+  async function addFiles(files) {
+    if (!files || !files.length) return;
+    if (!db) { notify('लोकल फ़ाइल स्टोरेज उपलब्ध नहीं है। Chrome या Edge में खोलकर देखें।'); return; }
+    let added = 0;
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('video/')) continue;
+      const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now()+'-'+Math.random().toString(16).slice(2));
+      notify(`इम्पोर्ट हो रहा है: ${file.name}`);
+      try {
+        const meta = await readMetadata(file);
+        const thumb = await getThumb(file);
+        await storeFile({id, blob:file, name:file.name, type:file.type, size:file.size});
+        videos.push({id, name:file.name, originalName:file.name, type:file.type, size:file.size, duration:meta.duration, width:meta.width, height:meta.height, thumb, addedAt:Date.now()});
+        added++;
+        saveRecords(); render();
+      } catch(e) {
+        console.error(e);
+        notify(`"${file.name}" सेव नहीं हो सका। स्टोरेज सीमा जाँचें।`);
+      }
+    }
+    $('videoPicker').value = '';
+    notify(added ? `${added} वीडियो लाइब्रेरी में जोड़े गए` : 'कोई वीडियो नहीं जोड़ा गया');
+  }
+  function fitPlayerStage() {
+    const stage = $('playerStage'), video = $('videoPlayer'), overlay = $('playerOverlay');
+    if (!video.videoWidth || !video.videoHeight) return;
+    if (document.fullscreenElement === stage || document.webkitFullscreenElement === stage || overlay.classList.contains('pseudo-fullscreen')) return;
+    const ratio = video.videoWidth / video.videoHeight;
+    const maxWidth = Math.min(1100, Math.max(1, window.innerWidth - 24));
+    const maxHeight = Math.max(1, window.innerHeight - 24);
+    const width = Math.max(1, Math.min(maxWidth, maxHeight * ratio));
+    const height = width / ratio;
+    stage.style.width = `${width}px`;
+    stage.style.height = `${height}px`;
+    stage.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+  }
+  $('videoPlayer').addEventListener('loadedmetadata', fitPlayerStage);
+  window.addEventListener('resize', fitPlayerStage, {passive:true});
+
+  function parseLinkedMedia(raw) {
+    const text = String(raw || '').trim();
+    if (!text) return null;
+    let url;
+    try { url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : 'https://' + text); }
+    catch (e) { return null; }
+    if (!['http:', 'https:'].includes(url.protocol)) return null;
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
+    const path = url.pathname;
+    let youtubeId = '';
+    if (host === 'youtu.be') youtubeId = path.split('/').filter(Boolean)[0] || '';
+    else if (/(^|\.)youtube\.com$/.test(host) || host === 'youtube-nocookie.com') {
+      youtubeId = url.searchParams.get('v') || (path.match(/^\/(?:shorts|embed|live|v)\/([^/?]+)/i) || [])[1] || '';
+    }
+    if (youtubeId && /^[A-Za-z0-9_-]{11}$/.test(youtubeId)) {
+      return {kind:'youtube', id:youtubeId, url:url.href, host:'YouTube', title:'YouTube वीडियो', thumbnail:`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`, note:'वीडियो VideoVault के प्लेयर में खुलेगा। YouTube के सामान्य कंट्रोल छिपे रहेंगे; ऐप के gesture controls इस्तेमाल होंगे।'};
+    }
+    const instagramMatch = (host === 'instagram.com' || host.endsWith('.instagram.com')) ? path.match(/^\/(p|reel|reels|tv)\/([^/?#]+)/i) : null;
+    if (instagramMatch) {
+      return {kind:'platform', platform:'Instagram', url:url.href, host:'Instagram', title:'Instagram वीडियो / रील', thumbnail:'', note:'Instagram अपने embed/player को नियंत्रित करता है। इस HTML ऐप से उसकी playback speed और volume को विश्वसनीय रूप से नियंत्रित नहीं किया जा सकता; मूल लिंक खोला जा सकता है।'};
+    }
+    const tiktok = host === 'tiktok.com' || host.endsWith('.tiktok.com');
+    if (tiktok) return {kind:'platform', platform:'TikTok', url:url.href, host:'TikTok', title:'TikTok वीडियो', thumbnail:'', note:'TikTok के पेज और playback controls प्लेटफ़ॉर्म द्वारा नियंत्रित होते हैं। यह लिंक मूल प्लेटफ़ॉर्म पर खुलेगा।'};
+    if (/\.(mp4|webm|ogv|ogg)(?:$)/i.test(url.pathname)) {
+      let fileName = path.split('/').filter(Boolean).pop() || 'Online video';
+      try { fileName = decodeURIComponent(fileName); } catch (e) {}
+      return {kind:'direct', url:url.href, host:host, title:fileName, thumbnail:'', note:'सीधा वीडियो लिंक मिला। वीडियो मौजूदा VideoVault प्लेयर और उसके brightness, volume, speed, seek gestures के साथ चलेगा।'};
+    }
+    return {kind:'platform', platform:host, url:url.href, host:host, title:'वेब वीडियो लिंक', thumbnail:'', note:'यह सामान्य वेब/सोशल लिंक है, सीधा वीडियो फ़ाइल लिंक नहीं। साइट के embed प्रतिबंधों के कारण इसका playback VideoVault के सभी custom controls से नियंत्रित नहीं हो सकता।'};
+  }
+
+  function updateLinkActionState() {
+    const hasText = Boolean($('linkInput').value.trim());
+    const button = $('linkActionBtn');
+    button.textContent = hasText ? 'Search' : 'Paste';
+    button.classList.toggle('search-ready', hasText);
+    button.setAttribute('aria-label', hasText ? 'लिंक खोजें' : 'क्लिपबोर्ड से लिंक पेस्ट करें');
+  }
+
+  async function loadYouTubeApi() {
+    if (window.YT && window.YT.Player) return window.YT;
+    if (youtubeApiPromise) return youtubeApiPromise;
+    youtubeApiPromise = new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        if (error) { youtubeApiPromise = null; reject(error); }
+        else resolve(window.YT);
+      };
+      const previousCallback = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        try { if (typeof previousCallback === 'function') previousCallback(); } catch (e) {}
+        finish(null);
+      };
+      let timeout = setTimeout(() => finish(new Error('YouTube player API timed out')), 15000);
+      if (!document.querySelector('script[data-videovault-youtube-api]')) {
+        const script = document.createElement('script');
+        script.src = 'https://www.youtube.com/iframe_api';
+        script.async = true;
+        script.dataset.videovaultYoutubeApi = 'true';
+        script.onerror = () => finish(new Error('YouTube player API could not load'));
+        document.head.appendChild(script);
+      }
+      if (window.YT && window.YT.Player) finish(null);
+    });
+    return youtubeApiPromise;
+  }
+
+  function disposeExternalPlayer() {
+    clearInterval(externalUiTimer);
+    externalUiTimer = null;
+    if (ytPlayer) { try { ytPlayer.destroy(); } catch (e) {} }
+    ytPlayer = null;
+    ytState = -1;
+    const host = $('playerStage').querySelector('.external-player, #youtubePlayerHost, iframe');
+    if (host) host.remove();
+    activeExternal = null;
+    $('videoPlayer').style.display = 'block';
+  }
+
+  function showPlayerShell(title) {
+    $('playerStage').style.width = '';
+    $('playerStage').style.height = '';
+    $('playerStage').style.aspectRatio = '16 / 9';
+    $('seekSlider').value = '0';
+    updateSeekVisual();
+    const playerTitle = $('playerTitle');
+    if (playerTitle) playerTitle.textContent = title || 'वीडियो';
+    playerBrightness = 1; playerZoom = 1; playerPanX = 0; playerPanY = 0;
+    $('videoPlayer').style.transform = '';
+    $('brightnessMeter').classList.remove('visible');
+    $('volumeMeter').classList.remove('visible');
+    $('speedMeter').classList.remove('visible');
+    applyPlayerBrightness(); applyPlayerZoom();
+    $('playerOverlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+    $('playerHud').classList.remove('hud-hidden');
+    showHud();
+  }
+
+  function showLinkedResult(info) {
+    linkedMedia = info;
+    $('linkResultSection').classList.remove('hidden');
+    $('linkResultStatus').textContent = info.host || 'लिंक';
+    const thumb = info.thumbnail
+      ? `<img src="${esc(info.thumbnail)}" alt="वीडियो थंबनेल" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
+      : '<span style="font-size:38px">🎬</span>';
+    const badge = info.kind === 'youtube' ? 'YouTube' : (info.kind === 'direct' ? 'Direct video' : (info.host || 'Online video'));
+    const note = info.kind === 'platform'
+      ? `${info.note} इस लिंक से असली वीडियो फ़ाइल उपलब्ध न होने पर इसे मूल प्लेटफ़ॉर्म में खोलना पड़ेगा।`
+      : (info.kind === 'youtube'
+          ? 'चलाने के लिए कार्ड पर कहीं भी टैप करें। उपलब्ध app controls इसी player से काम करेंगे।'
+          : info.note + ' चलाने के लिए कार्ड पर कहीं भी टैप करें।');
+    $('linkedVideoGrid').innerHTML = `<article class="link-result-card" id="linkedVideoCard" role="button" tabindex="0" aria-label="${esc(info.title)} चलाएँ"><div class="link-result-thumb">${thumb}<div class="link-thumb-overlay"><span>▶</span></div></div><div class="link-result-body"><h3 class="link-result-title">${esc(info.title)}</h3><div class="meta"><span>${esc(badge)}</span><span>कार्ड टैप करें ▶</span></div><p class="link-result-note">${esc(note)}</p></div></article>`;
+  }
+
+  async function searchLinkedUrl() {
+    const raw = $('linkInput').value.trim();
+    const info = parseLinkedMedia(raw);
+    if (!info) { notify('कृपया सही http/https वीडियो या सोशल मीडिया लिंक डालें।'); return; }
+    showLinkedResult(info);
+    if (info.kind === 'youtube') loadYouTubeApi().catch(() => {});
+    if (info.kind === 'youtube' || info.kind === 'direct') notify('लिंक मिल गया। वीडियो चलाने के लिए कार्ड पर कहीं भी टैप करें।');
+    else notify('लिंक मिल गया। इस प्लेटफ़ॉर्म के playback प्रतिबंध लागू हो सकते हैं।');
+  }
+
+  async function playLinkedVideo(info) {
+    if (!info) return;
+    if (info.kind === 'platform') {
+      // A normal social-page URL is not a media stream. A static HTML file cannot bypass
+      // platform DRM/embed rules, so use the original page as a transparent fallback.
+      notify(`${info.host || 'यह प्लेटफ़ॉर्म'} ने direct video stream नहीं दिया; मूल वीडियो पेज खोला जा रहा है।`);
+      const opened = window.open(info.url, '_blank', 'noopener,noreferrer');
+      if (!opened) {
+        try { location.href = info.url; } catch (e) { notify('यह प्लेटफ़ॉर्म इस ऐप के अंदर चलने की अनुमति नहीं देता।'); }
+      }
+      return;
+    }
+    disposeExternalPlayer();
+    if (activeUrl) { URL.revokeObjectURL(activeUrl); activeUrl = null; }
+    const video = $('videoPlayer');
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.style.display = 'block';
+    if (info.kind === 'direct') {
+      activeExternal = {kind:'direct', url:info.url, title:info.title};
+      video.src = info.url;
+      video.playbackRate = 1;
+      $('speedValue').textContent = '1×';
+      showPlayerShell(info.title);
+      video.play().then(updatePlayPause).catch(() => {
+        updatePlayPause();
+        notify('वीडियो नहीं चला। लिंक direct media file होना चाहिए और सर्वर को वीडियो playback की अनुमति देनी चाहिए।');
+      });
+      return;
+    }
+    if (info.kind !== 'youtube') return;
+    activeExternal = {kind:'youtube', id:info.id, url:info.url, title:info.title};
+    video.style.display = 'none';
+    showPlayerShell(info.title);
+    const host = document.createElement('div');
+    host.id = 'youtubePlayerHost';
+    host.className = 'external-player';
+    $('playerStage').insertBefore(host, $('playerDim'));
+    try {
+      const api = await loadYouTubeApi();
+      if (!activeExternal || activeExternal.kind !== 'youtube' || activeExternal.id !== info.id) return;
+      const playerVars = {autoplay:1, controls:0, disablekb:1, fs:0, modestbranding:1, rel:0, playsinline:1, iv_load_policy:3, enablejsapi:1};
+      // YouTube requires a real web origin/referrer in many WebView deployments. Never pass the literal "null" origin from file://.
+      if (location.origin && /^https?:\/\//i.test(location.origin)) { playerVars.origin = location.origin; playerVars.widget_referrer = location.href; }
+      ytPlayer = new api.Player(host, {
+        width:'100%', height:'100%', videoId:info.id, playerVars,
+        events: {
+          onReady: (event) => {
+            if (!activeExternal || activeExternal.kind !== 'youtube' || activeExternal.id !== info.id) { try { event.target.destroy(); } catch (e) {} return; }
+            ytPlayer = event.target;
+            try { const iframe = event.target.getIframe(); iframe.classList.add('external-player'); iframe.setAttribute('title', 'VideoVault YouTube video'); iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen'); iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin'); } catch (e) {}
+            ytState = ytPlayer.getPlayerState();
+            try { ytPlayer.setVolume(100); ytPlayer.setPlaybackRate(1); ytPlayer.playVideo(); } catch (e) {}
+            $('speedValue').textContent = '1×';
+            $('volumeFill').style.height = '100%'; $('volumeValue').textContent = '100%';
+            updatePlayPause(); updateExternalPlayerUi();
+            clearInterval(externalUiTimer);
+            externalUiTimer = setInterval(updateExternalPlayerUi, 300);
+          },
+          onAutoplayBlocked: () => { if (activeExternal && activeExternal.kind === 'youtube' && activeExternal.id === info.id) notify('ऑटो-प्ले ब्लॉक हुआ। प्लेयर के बीच वाले Play कंट्रोल पर टैप करें।'); },
+          onStateChange: (event) => {
+            if (!activeExternal || activeExternal.kind !== 'youtube' || activeExternal.id !== info.id) return;
+            ytState = event.data;
+            updatePlayPause(); updateExternalPlayerUi();
+            if (window.YT && event.data === window.YT.PlayerState.ENDED) showHud();
+          },
+          onError: (event) => { if (activeExternal && activeExternal.kind === 'youtube' && activeExternal.id === info.id) { const code = Number(event && event.data); const message = code === 101 || code === 150 ? 'इस YouTube वीडियो के मालिक ने बाहरी प्लेयर में playback बंद किया है।' : code === 153 ? 'YouTube को इस ऐप से वैध HTTPS referrer नहीं मिला। ऐप को HTTPS वेब होस्ट या सही WebView referrer के साथ चलाना होगा।' : 'YouTube वीडियो अभी प्ले नहीं हो सका (player error ' + (code || 'unknown') + ')। इंटरनेट या वीडियो की embed अनुमति जाँचें।'; notify(message); } }
+        }
+      });
+    } catch (e) {
+      closePlayer();
+      notify('YouTube प्लेयर लोड नहीं हुआ। इंटरनेट कनेक्शन जाँचें या ऐप को HTTPS/WebView में खोलें।');
+    }
+  }
+
+  function isYouTubeActive() { return Boolean(activeExternal && activeExternal.kind === 'youtube' && ytPlayer); }
+  function getMediaDuration() { return isYouTubeActive() ? Number(ytPlayer.getDuration()) || 0 : $('videoPlayer').duration; }
+  function getMediaTime() { return isYouTubeActive() ? Number(ytPlayer.getCurrentTime()) || 0 : $('videoPlayer').currentTime; }
+  function setMediaTime(value) {
+    const time = Math.max(0, Number(value) || 0);
+    if (isYouTubeActive()) { try { ytPlayer.seekTo(time, true); } catch (e) {} }
+    else { const v = $('videoPlayer'); if (Number.isFinite(v.duration)) v.currentTime = Math.max(0, Math.min(v.duration, time)); }
+  }
+  function getMediaVolume() { return isYouTubeActive() ? (Number(ytPlayer.getVolume()) || 0) / 100 : $('videoPlayer').muted ? 0 : $('videoPlayer').volume; }
+  function applyMediaVolume(value) {
+    const v = Math.max(0, Math.min(1, Number(value) || 0));
+    if (isYouTubeActive()) { try { ytPlayer.setVolume(Math.round(v * 100)); if (v === 0) ytPlayer.mute(); else ytPlayer.unMute(); } catch (e) {} }
+    else { $('videoPlayer').volume = v; $('videoPlayer').muted = v === 0; }
+    return v;
+  }
+  function getMediaRate() { return isYouTubeActive() ? (Number(ytPlayer.getPlaybackRate()) || 1) : $('videoPlayer').playbackRate; }
+  function applyMediaRate(value) {
+    const requested = Math.max(.25, Math.min(3, Number(value) || 1));
+    let actual = requested;
+    if (isYouTubeActive()) {
+      try {
+        const options = (ytPlayer.getAvailablePlaybackRates && ytPlayer.getAvailablePlaybackRates()) || [1];
+        actual = options.length ? options.reduce((best, rate) => Math.abs(rate-requested) < Math.abs(best-requested) ? rate : best, options[0]) : 1;
+        ytPlayer.setPlaybackRate(actual);
+      } catch (e) { actual = 1; }
+    } else $('videoPlayer').playbackRate = actual;
+    $('speedValue').textContent = formatRate(actual);
+    return actual;
+  }
+  function toggleMediaPlayback() {
+    if (isYouTubeActive()) {
+      try { if (ytState === 1 || ytState === 3) ytPlayer.pauseVideo(); else ytPlayer.playVideo(); } catch (e) {}
+    } else {
+      const v = $('videoPlayer');
+      if (v.paused) v.play().catch(() => {}); else v.pause();
+    }
+    showHud();
+  }
+  function updateExternalPlayerUi() {
+    if (!isYouTubeActive()) return;
+    let current = 0, duration = 0;
+    try { current = Number(ytPlayer.getCurrentTime()) || 0; duration = Number(ytPlayer.getDuration()) || 0; } catch (e) {}
+    $('currentTime').textContent = fmtPlayerTime(current);
+    $('durationTime').textContent = fmtPlayerTime(duration);
+    if (!isSeeking && duration > 0) $('seekSlider').value = String(Math.round(current / duration * 1000));
+    updateSeekVisual();
+  }
+
+  async function playVideo(id) {
+    const record = videos.find(v=>v.id===id); if (!record) return;
+    disposeExternalPlayer();
+    $('videoPlayer').style.display = 'block';
+    try {
+      const file = await getFile(id);
+      if (!file || !file.blob) { notify('वीडियो फ़ाइल नहीं मिली। कृपया इसे दोबारा जोड़ें।'); return; }
+      if (activeUrl) URL.revokeObjectURL(activeUrl);
+      activeUrl = URL.createObjectURL(file.blob);
+      $('videoPlayer').src = activeUrl;
+      $('playerStage').style.width=''; $('playerStage').style.height=''; $('playerStage').style.aspectRatio='16 / 9';
+      $('seekSlider').value = '0'; updateSeekVisual();
+      $('videoPlayer').playbackRate = 1;
+      const playerTitle = $('playerTitle'); if (playerTitle) playerTitle.textContent = record.name;
+      $('speedValue').textContent = '1×'; $('speedMeter').classList.remove('visible');
+      playerBrightness = 1; playerZoom = 1; playerPanX = 0; playerPanY = 0;
+      $('videoPlayer').style.transform = '';
+      applyPlayerBrightness(); applyPlayerZoom(); updatePlayPause();
+      record.lastPlayedAt = Date.now(); saveRecords(); render();
+      $('playerOverlay').classList.add('show');
+      document.body.style.overflow='hidden';
+      $('playerHud').classList.remove('hud-hidden');
+      $('videoPlayer').play().then(updatePlayPause).catch(updatePlayPause);
+    } catch(e) { notify('वीडियो खोला नहीं जा सका।'); }
+  }
+  function closePlayer() {
+    const stage = $('playerStage');
+    if ((document.fullscreenElement === stage) && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+    else if (document.webkitFullscreenElement === stage && document.webkitExitFullscreen) document.webkitExitFullscreen();
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e) {}
+    stage.classList.remove('force-landscape');
+    $('playerOverlay').classList.remove('pseudo-fullscreen');
+    $('brightnessMeter').classList.remove('visible'); $('volumeMeter').classList.remove('visible'); $('speedMeter').classList.remove('visible');
+    clearTimeout(hudTimer); clearTimeout(gestureTimer); clearTimeout(holdTimer);
+    gestureStart = null; pinchStart = null; touchPoints.clear();
+    $('videoPlayer').pause(); $('videoPlayer').removeAttribute('src'); $('videoPlayer').load();
+    disposeExternalPlayer();
+    $('playerOverlay').classList.remove('show');
+    document.body.style.overflow='';
+    $('playerHud').classList.remove('hud-hidden');
+    if (activeUrl) { URL.revokeObjectURL(activeUrl); activeUrl=null; }
+    $('videoPlayer').style.display = 'block';
+  }
+  function showInfo(id) {
+    const v = videos.find(x=>x.id===id); if (!v) return;
+    $('detailContent').innerHTML = `<div class="detail-grid">
+      <div>वीडियो नाम</div><div>${esc(v.name)}</div><div>फ़ाइल नाम</div><div>${esc(v.originalName||v.name)}</div>
+      <div>साइज़</div><div>${fmtBytes(v.size)} (${((v.size||0)/1048576).toFixed(2)} MB)</div>
+      <div>अवधि</div><div>${fmtDuration(v.duration)}</div><div>रिज़ॉल्यूशन</div><div>${v.width&&v.height ? `${v.width} × ${v.height}` : 'उपलब्ध नहीं'}</div>
+      <div>फ़ॉर्मेट</div><div>${esc(v.type||'अज्ञात')}</div><div>अपलोड/जोड़ा गया</div><div>${v.addedAt ? new Date(v.addedAt).toLocaleString('hi-IN') : 'उपलब्ध नहीं'}</div>
+      <div>आख़िरी बार चलाया</div><div>${v.lastPlayedAt ? new Date(v.lastPlayedAt).toLocaleString('hi-IN') : 'अभी तक नहीं चलाया'}</div>
+      </div><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:18px"><button class="primary" id="infoPlay">▶ वीडियो चलाएँ</button><button id="renameBtn">✎ नाम बदलें</button></div>`;
+    $('detailOverlay').classList.add('show');
+    $('infoPlay').onclick = () => { $('detailOverlay').classList.remove('show'); playVideo(id); };
+    $('renameBtn').onclick = () => {
+      const next = prompt('वीडियो का नया डिस्प्ले नाम लिखें:', v.name);
+      if (next && next.trim()) { v.name=next.trim(); saveRecords(); render(); showInfo(id); notify('डिस्प्ले नाम बदल दिया गया'); }
+    };
+  }
+  async function removeVideo(id) {
+    const v = videos.find(x=>x.id===id); if (!v) return;
+    if (!confirm(`क्या आप इस वीडियो को लाइब्रेरी से हटाना चाहते हैं?\n\n${v.name}\n\nOK = हटाएँ · Cancel = रद्द करें`)) return;
+    try { if (db) await deleteFile(id); } catch(e) {}
+    videos = videos.filter(x=>x.id!==id); saveRecords(); render(); notify('वीडियो लाइब्रेरी से हटा दिया गया');
+  }
+  function setTheme(theme) {
+    const normalized = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = normalized;
+    try { localStorage.setItem('videovault-theme', normalized); } catch(e) {}
+    const isDark = normalized === 'dark';
+    const toggle = $('themeToggle');
+    if (toggle) {
+      toggle.classList.toggle('is-on', isDark);
+      toggle.setAttribute('aria-checked', String(isDark));
+      toggle.setAttribute('aria-label', isDark ? 'Dark Theme चालू है; बंद करने के लिए दबाएँ' : 'Dark Theme बंद है; चालू करने के लिए दबाएँ');
+    }
+    const status = $('themeStatus');
+    if (status) status.textContent = isDark ? 'Dark Theme चालू है' : 'Light Mode चालू है';
+  }
+  function exportBackup() {
+    const payload = {app:'VideoVault', version:1, exportedAt:new Date().toISOString(), videos:videos.map(({thumb,...v})=>v)};
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href=url; a.download='videovault-backup.json'; a.click(); URL.revokeObjectURL(url);
+    notify('लाइब्रेरी सूची का बैकअप डाउनलोड हुआ');
+  }
+  async function importBackup(file) {
+    try {
+      const data = JSON.parse(await file.text());
+      if (!data || !Array.isArray(data.videos)) throw new Error('invalid');
+      let count=0;
+      for (const item of data.videos) {
+        if (!item || !item.id || !item.name || videos.some(v=>v.id===item.id)) continue;
+        videos.push({...item, thumb:'', addedAt:item.addedAt||Date.now()}); count++;
+      }
+      saveRecords(); render(); notify(`${count} रिकॉर्ड इम्पोर्ट किए गए। वीडियो फ़ाइलें अलग से जोड़नी होंगी।`);
+    } catch(e) { notify('यह वैध VideoVault JSON बैकअप नहीं है।'); }
+    $('backupPicker').value='';
+  }
+  async function clearLibrary() {
+    try {
+      if (db) {
+        await new Promise((resolve,reject)=>{
+          const tx=db.transaction('files','readwrite');
+          tx.objectStore('files').clear();
+          tx.oncomplete=resolve;
+          tx.onerror=()=>reject(tx.error||new Error('clear failed'));
+          tx.onabort=()=>reject(tx.error||new Error('clear aborted'));
+        });
+      }
+      videos=[];
+      try { localStorage.removeItem(DB_KEY); } catch(e) { saveRecords(); }
+      render();
+      $('clearConfirmOverlay').classList.remove('show');
+      $('settingsOverlay').classList.remove('show');
+      document.body.style.overflow='';
+      $('clearConfirmInput').value='';
+      $('clearConfirmError').textContent='';
+      notify('VideoVault की पूरी लाइब्रेरी साफ़ कर दी गई');
+    } catch(e) {
+      console.error(e);
+      $('clearConfirmError').textContent='डेटा साफ़ नहीं हो सका। दोबारा कोशिश करें।';
+      notify('लाइब्रेरी साफ़ नहीं हो सकी');
+    }
+  }  // Player gestures use Pointer Events so swipe, pinch and drag share one smooth path.
+  // Brightness is simulated because web pages cannot directly set hardware screen brightness.
+  let playerBrightness = 1, playerZoom = 1, playerPanX = 0, playerPanY = 0;
+  let hudTimer = null, gestureTimer = null, gestureStart = null, holdTimer = null;
+  let touchPoints = new Map(), pinchStart = null, lastTapAt = 0, lastTapX = 0, lastTapY = 0;
+  let suppressClickUntil = 0, isSeeking = false;
+
+  function applyPlayerBrightness() {
+    $('playerDim').style.opacity = String(Math.max(0, Math.min(1, 1-playerBrightness)));
+    $('brightnessFill').style.height = (playerBrightness*100)+'%';
+    $('brightnessValue').textContent = Math.round(playerBrightness*100)+'%';
+  }
+  function clampPan(x, y, zoom=playerZoom) {
+    const rect = $('playerStage').getBoundingClientRect();
+    const maxX = rect.width * Math.max(0, zoom - 1) / 2;
+    const maxY = rect.height * Math.max(0, zoom - 1) / 2;
+    return {x: Math.max(-maxX, Math.min(maxX, x)), y: Math.max(-maxY, Math.min(maxY, y))};
+  }
+  function applyPlayerZoom() {
+    const p = clampPan(playerPanX, playerPanY, playerZoom);
+    playerPanX = p.x; playerPanY = p.y;
+    const mediaSurface = isYouTubeActive() ? $('playerStage').querySelector('iframe') : $('videoPlayer');
+    if (mediaSurface) mediaSurface.style.transform = `translate3d(${playerPanX}px,${playerPanY}px,0) scale(${playerZoom})`;
+  }
+  function updatePlayPause() {
+    const paused = isYouTubeActive() ? !(ytState === 1 || ytState === 3) : $('videoPlayer').paused;
+    $('playPauseBtn').innerHTML = paused
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.1 5.8Q8.1 4.8 9.1 5.4L18.2 11.4Q19.2 12 18.2 12.6L9.1 18.6Q8.1 19.2 8.1 18.2Z"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4.2" height="14" rx="1.1"/><rect x="13.3" y="5" width="4.2" height="14" rx="1.1"/></svg>';
+    $('playPauseBtn').classList.toggle('is-paused', paused);
+    $('playPauseBtn').classList.toggle('is-playing', !paused);
+    $('playPauseBtn').setAttribute('aria-label', paused ? 'चलाएँ' : 'पॉज़ करें');
+    $('playerOverlay').classList.toggle('media-paused', paused);
+  }
+  function fmtPlayerTime(t) {
+    if (!Number.isFinite(t) || t < 0) t = 0;
+    const m=Math.floor(t/60), sec=Math.floor(t%60);
+    return m+':'+String(sec).padStart(2,'0');
+  }
+  function updateSeekVisual() {
+    const slider = $('seekSlider');
+    const max = Number(slider.max) || 1000;
+    const value = Math.max(0, Math.min(max, Number(slider.value) || 0));
+    slider.style.setProperty('--progress', (value / max * 100) + '%');
+  }
+  let skipFeedbackTimer = null;
+  function showSkipFeedback(direction, x, y) {
+    const stage = $('playerStage');
+    const feedback = $('skipFeedback');
+    const rect = stage.getBoundingClientRect();
+    const px = Math.max(14, Math.min(86, ((x - rect.left) / rect.width) * 100));
+    const py = Math.max(17, Math.min(83, ((y - rect.top) / rect.height) * 100));
+    feedback.style.left = px + '%';
+    feedback.style.top = py + '%';
+    feedback.classList.toggle('backward', direction < 0);
+    $('skipDirectionText').textContent = direction > 0 ? 'आगे' : 'पीछे';
+    $('skipAmount').textContent = '10 सेकंड';
+    feedback.classList.add('show');
+    clearTimeout(skipFeedbackTimer);
+    skipFeedbackTimer = setTimeout(() => feedback.classList.remove('show'), 1000);
+  }
+  function skipByGesture(direction, x, y) {
+    const duration = getMediaDuration(), current = getMediaTime();
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    setMediaTime(Math.max(0, Math.min(duration, current + (direction > 0 ? 10 : -10))));
+    updateSeekVisual();
+    // Keep the feedback clean: hide the timeline and player HUD while the one-second skip cue is shown.
+    clearTimeout(hudTimer);
+    $('playerHud').classList.add('hud-hidden');
+    showSkipFeedback(direction, x, y);
+    suppressClickUntil = Date.now() + 450;
+  }
+  function formatRate(rate) {
+    return `${Number(rate.toFixed(2)).toString()}×`;
+  }
+  function showHud() {
+    $('playerHud').classList.remove('hud-hidden');
+    clearTimeout(hudTimer);
+    hudTimer=setTimeout(()=> $('playerHud').classList.add('hud-hidden'), 3000);
+  }
+  function meterFor(side) {
+    return $(side==='left'?'brightnessMeter':side==='right'?'volumeMeter':'speedMeter');
+  }
+  function showMeter(side) {
+    const meter = meterFor(side);
+    meter.classList.add('visible');
+    clearTimeout(gestureTimer);
+    gestureTimer=setTimeout(()=>{
+      $('brightnessMeter').classList.remove('visible');
+      $('volumeMeter').classList.remove('visible');
+      $('speedMeter').classList.remove('visible');
+    }, 750);
+  }
+  function hideMetersSoon(delay=420) {
+    clearTimeout(gestureTimer);
+    gestureTimer=setTimeout(()=>{
+      $('brightnessMeter').classList.remove('visible');
+      $('volumeMeter').classList.remove('visible');
+      $('speedMeter').classList.remove('visible');
+    }, delay);
+  }
+  function setVolumeFromGesture(value) {
+    const v=applyMediaVolume(value);
+    $('volumeFill').style.height=(v*100)+'%';
+    $('volumeValue').textContent=Math.round(v*100)+'%';
+    $('volumeMeter').querySelector('.meter-icon').textContent=v===0?'🔇':'🔊';
+    showMeter('right');
+  }
+  function setSpeed(value) {
+    applyMediaRate(value);
+    showMeter('speed');
+  }
+  $('playPauseBtn').addEventListener('click',e=>{e.stopPropagation();toggleMediaPlayback();});
+  $('videoPlayer').addEventListener('play',updatePlayPause);
+  $('videoPlayer').addEventListener('pause',updatePlayPause);
+  $('videoPlayer').addEventListener('timeupdate',()=>{
+    if (isYouTubeActive()) return;
+    const v=$('videoPlayer');
+    $('currentTime').textContent=fmtPlayerTime(v.currentTime);
+    $('durationTime').textContent=fmtPlayerTime(v.duration);
+    if(!isSeeking && Number.isFinite(v.duration) && v.duration>0) $('seekSlider').value=String(Math.round(v.currentTime/v.duration*1000));
+    updateSeekVisual();
+  });
+  $('seekSlider').addEventListener('input',()=>{
+    const duration=getMediaDuration();
+    if(Number.isFinite(duration) && duration>0) setMediaTime((Number($('seekSlider').value)/1000)*duration);
+    updateSeekVisual();
+    showHud();
+  });
+
+  async function exitPlayerFullscreen() {
+    const stage = $('playerStage');
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+      else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } catch(e) {}
+    $('playerOverlay').classList.remove('pseudo-fullscreen');
+    stage.classList.remove('force-landscape');
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e) {}
+    showHud();
+  }
+  async function enterPlayerFullscreen() {
+    const stage = $('playerStage');
+    const request = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (request) {
+      try {
+        await request.call(stage);
+        $('playerOverlay').classList.remove('pseudo-fullscreen');
+        let orientationLocked = false;
+        try {
+          if (screen.orientation && typeof screen.orientation.lock === 'function') {
+            await screen.orientation.lock('landscape');
+            orientationLocked = true;
+          }
+        } catch(e) { /* CSS landscape fallback below */ }
+        stage.classList.toggle('force-landscape', !orientationLocked && window.matchMedia('(orientation: portrait)').matches);
+        showHud();
+        return;
+      } catch(e) { /* Try the CSS fullscreen fallback for browsers without div fullscreen. */ }
+    }
+    $('playerOverlay').classList.add('pseudo-fullscreen');
+    stage.classList.toggle('force-landscape', window.matchMedia('(orientation: portrait)').matches);
+    showHud();
+  }
+  $('playerFullscreen').addEventListener('click',async()=>{
+    const stage=$('playerStage');
+    if (document.fullscreenElement === stage || document.webkitFullscreenElement === stage || $('playerOverlay').classList.contains('pseudo-fullscreen')) {
+      await exitPlayerFullscreen();
+    } else {
+      await enterPlayerFullscreen();
+    }
+  });
+  document.addEventListener('fullscreenchange',()=>{
+    if (document.fullscreenElement !== $('playerStage')) {
+      $('playerStage').classList.remove('force-landscape');
+      try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e) {}
+    }
+  });
+  document.addEventListener('webkitfullscreenchange',()=>{
+    if (document.webkitFullscreenElement !== $('playerStage')) $('playerStage').classList.remove('force-landscape');
+  });
+  let singleTapTimer = null;
+  $('playerStage').addEventListener('click',e=>{
+    if(Date.now()<suppressClickUntil) return;
+    if(e.target.closest('button,input,label')) return;
+    const now = Date.now();
+    const dx = e.clientX - lastTapX, dy = e.clientY - lastTapY;
+    if(lastTapAt && now-lastTapAt < 310 && Math.hypot(dx,dy) < 70){
+      clearTimeout(singleTapTimer);
+      lastTapAt = 0;
+      const rect = $('playerStage').getBoundingClientRect();
+      const direction = e.clientX < rect.left + rect.width/2 ? -1 : 1;
+      skipByGesture(direction, e.clientX, e.clientY);
+      return;
+    }
+    lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
+    clearTimeout(singleTapTimer);
+    singleTapTimer = setTimeout(()=>{
+      lastTapAt = 0;
+      // Single tap reveals/hides HUD; playback changes through the play/pause button.
+      const hud=$('playerHud');
+      if(hud.classList.contains('hud-hidden')) showHud();
+      else { clearTimeout(hudTimer); hud.classList.add('hud-hidden'); }
+    }, 310);
+  });
+
+  function beginPointerGesture(e) {
+    const stage = $('playerStage');
+    const rect = stage.getBoundingClientRect();
+    const point = {x:e.clientX, y:e.clientY, type:e.pointerType};
+    touchPoints.set(e.pointerId, point);
+    try { stage.setPointerCapture(e.pointerId); } catch(err) {}
+
+    if (touchPoints.size >= 2) {
+      clearTimeout(holdTimer);
+      gestureStart = null;
+      const pts = Array.from(touchPoints.values());
+      const ax = pts[0].x, ay = pts[0].y, bx = pts[1].x, by = pts[1].y;
+      const cx = (ax + bx) / 2 - rect.left, cy = (ay + by) / 2 - rect.top;
+      pinchStart = {
+        distance: Math.max(1, Math.hypot(bx-ax, by-ay)), zoom: playerZoom,
+        qx: (cx - rect.width/2 - playerPanX) / playerZoom,
+        qy: (cy - rect.height/2 - playerPanY) / playerZoom
+      };
+      suppressClickUntil = Date.now() + 800;
+      return;
+    }
+
+    const side = e.clientX - rect.left < rect.width/2 ? 'left' : 'right';
+    gestureStart = {
+      id:e.pointerId, x:e.clientX, y:e.clientY,
+      brightness:playerBrightness, volume:getMediaVolume(),
+      rate:getMediaRate(), panX:playerPanX, panY:playerPanY,
+      side, topZone:e.clientY-rect.top < Math.max(82,rect.height*.22),
+      bottomZone:e.clientY-rect.top > rect.height*.74,
+      moved:false, mode: playerZoom > 1 ? 'pan' : null, longPress:false
+    };
+    clearTimeout(holdTimer);
+    holdTimer=setTimeout(()=>{
+      if(gestureStart && !gestureStart.moved && touchPoints.size===1 && playerZoom===1){
+        setSpeed(2);
+        $('speedValue').textContent='2×';
+        gestureStart.longPress=true;
+        showMeter('speed');
+      }
+    },450);
+  }
+  $('playerStage').addEventListener('pointerdown',e=>{
+    if(e.target.closest('button,input,label')) return;
+    if(e.pointerType==='mouse' && e.button!==0) return;
+    beginPointerGesture(e);
+  });
+  $('playerStage').addEventListener('pointermove',e=>{
+    if(!touchPoints.has(e.pointerId)) return;
+    touchPoints.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
+    const rect=$('playerStage').getBoundingClientRect();
+
+    if(touchPoints.size>=2 && pinchStart){
+      const pts=Array.from(touchPoints.values());
+      const distance=Math.max(1,Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y));
+      const cx=(pts[0].x+pts[1].x)/2-rect.left, cy=(pts[0].y+pts[1].y)/2-rect.top;
+      const nextZoom=Math.max(1,Math.min(3.5,pinchStart.zoom*distance/pinchStart.distance));
+      playerZoom=nextZoom;
+      playerPanX=(cx-rect.width/2)-pinchStart.qx*playerZoom;
+      playerPanY=(cy-rect.height/2)-pinchStart.qy*playerZoom;
+      applyPlayerZoom();
+      suppressClickUntil=Date.now()+700;
+      clearTimeout(holdTimer);
+      return;
+    }
+
+    if(!gestureStart || gestureStart.id!==e.pointerId) return;
+    const dx=e.clientX-gestureStart.x, dy=e.clientY-gestureStart.y;
+    if(Math.abs(dx)>6 || Math.abs(dy)>6){
+      gestureStart.moved=true; clearTimeout(holdTimer);
+      if(!gestureStart.mode){
+        if(playerZoom>1) gestureStart.mode='pan';
+        else if(Math.abs(dx)>Math.abs(dy) && gestureStart.bottomZone) gestureStart.mode='skip';
+        else if(Math.abs(dx)>Math.abs(dy) && gestureStart.topZone) gestureStart.mode='speed';
+        else if(Math.abs(dy)>Math.abs(dx)) gestureStart.mode=gestureStart.side==='left'?'brightness':'volume';
+        else if(Math.abs(dx)>Math.abs(dy)) gestureStart.mode='speed';
+        else gestureStart.mode='none';
+      }
+    }
+    if(!gestureStart.moved) return;
+
+    if(gestureStart.mode==='pan'){
+      playerPanX=gestureStart.panX+dx; playerPanY=gestureStart.panY+dy;
+      applyPlayerZoom();
+      suppressClickUntil=Date.now()+500;
+    } else if(gestureStart.mode==='skip'){
+      // Do the seek on pointerup once, so one swipe always means exactly ten seconds.
+      suppressClickUntil=Date.now()+500;
+    } else if(gestureStart.mode==='speed'){
+      // Horizontal swipe: left-to-right increases speed; right-to-left decreases it.
+      const rate=Math.max(.25,Math.min(3,gestureStart.rate+(dx/Math.max(240,rect.width))*2.75));
+      setSpeed(rate);
+      suppressClickUntil=Date.now()+500;
+    } else if(gestureStart.mode==='brightness'){
+      playerBrightness=Math.max(.08,Math.min(1,gestureStart.brightness-dy/Math.max(200,rect.height)));
+      applyPlayerBrightness(); showMeter('left'); suppressClickUntil=Date.now()+500;
+    } else if(gestureStart.mode==='volume'){
+      setVolumeFromGesture(gestureStart.volume-dy/Math.max(200,rect.height));
+      suppressClickUntil=Date.now()+500;
+    }
+  });
+  function endPointerGesture(e) {
+    if(e && touchPoints.has(e.pointerId)) touchPoints.delete(e.pointerId);
+    clearTimeout(holdTimer);
+
+    // If one finger remains after a pinch, allow that finger to continue panning.
+    if(pinchStart){
+      pinchStart=null;
+      if(touchPoints.size===1 && playerZoom>1){
+        const [id,p]=touchPoints.entries().next().value;
+        const rect=$('playerStage').getBoundingClientRect();
+        gestureStart={id,x:p.x,y:p.y,brightness:playerBrightness,volume:getMediaVolume(),
+          rate:getMediaRate(),panX:playerPanX,panY:playerPanY,
+          side:p.x-rect.left<rect.width/2?'left':'right',topZone:false,moved:false,mode:'pan',longPress:false};
+        return;
+      }
+    }
+    if(gestureStart && (!e || gestureStart.id===e.pointerId)){
+      const finished = gestureStart;
+      if(finished.longPress){ setSpeed(finished.rate); }
+      if(finished.mode==='skip' && finished.moved && e){
+        const dx = e.clientX - finished.x;
+        if(Math.abs(dx) >= 36) skipByGesture(dx > 0 ? 1 : -1, finished.x, finished.y);
+      }
+      if(finished.moved) suppressClickUntil=Date.now()+380;
+      gestureStart=null;
+    }
+    if(touchPoints.size===0) hideMetersSoon(380);
+  }
+  $('playerStage').addEventListener('pointerup',endPointerGesture);
+  $('playerStage').addEventListener('pointercancel',endPointerGesture);
+  $('playerStage').addEventListener('lostpointercapture',endPointerGesture);
+
+  ['addBtn','heroAdd','emptyAdd'].forEach(id=>$(id).addEventListener('click',()=>$('videoPicker').click()));
+  $('videoPicker').addEventListener('change',e=>addFiles(e.target.files));
+  $('searchInput').addEventListener('input',render);
+  async function readClipboardTextForPaste() {
+    // Some native app wrappers can expose the clipboard to JavaScript; use one only if present.
+    const nativeBridges = [window.VideoVaultNative, window.NativeBridge, window.Android];
+    for (const bridge of nativeBridges) {
+      if (bridge && typeof bridge.getClipboardText === 'function') {
+        try {
+          const value = await bridge.getClipboardText();
+          if (typeof value === 'string' && value.trim()) return value;
+        } catch (e) { /* continue to the browser Clipboard API */ }
+      }
+    }
+    if (navigator.clipboard && typeof navigator.clipboard.readText === 'function') {
+      try {
+        const value = await navigator.clipboard.readText();
+        if (typeof value === 'string' && value.trim()) return value;
+      } catch (e) { /* some WebViews expose readText but deny its permission */ }
+    }
+    // Fallback for browsers which implement read() but not readText().
+    if (navigator.clipboard && typeof navigator.clipboard.read === 'function') {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        if (item.types && item.types.includes('text/plain')) {
+          const blob = await item.getType('text/plain');
+          const value = await blob.text();
+          if (value.trim()) return value;
+        }
+      }
+    }
+    throw new Error('Clipboard read is not available in this browser context');
+  }
+  function handleNativePasteEvent() {
+    // A real long-press/keyboard Paste works even in WebViews that deny programmatic reads.
+    setTimeout(() => {
+      updateLinkActionState();
+      if ($('linkInput').value.trim()) notify('लिंक पेस्ट हो गया। अब Search दबाएँ।');
+    }, 0);
+  }
+
+  $('linkInput').addEventListener('input',updateLinkActionState);
+  $('linkInput').addEventListener('keydown',e=>{
+    if(e.key==='Enter'){ e.preventDefault(); if($('linkInput').value.trim()) searchLinkedUrl(); else $('linkActionBtn').click(); }
+  });
+  $('linkSearchForm').addEventListener('submit',e=>{e.preventDefault(); if($('linkInput').value.trim()) searchLinkedUrl(); else $('linkActionBtn').click();});
+  $('linkInput').addEventListener('paste', handleNativePasteEvent);
+  $('linkActionBtn').addEventListener('click',async()=>{
+    if($('linkInput').value.trim()){ await searchLinkedUrl(); return; }
+    const button = $('linkActionBtn');
+    button.disabled = true;
+    try {
+      const clip = await readClipboardTextForPaste();
+      if(!clip || !clip.trim()) { notify('क्लिपबोर्ड में टेक्स्ट नहीं मिला। पहले कोई लिंक कॉपी करें।'); return; }
+      $('linkInput').value = clip.trim();
+      $('linkInput').dispatchEvent(new Event('input', {bubbles:true}));
+      $('linkInput').focus();
+      try { $('linkInput').setSelectionRange($('linkInput').value.length, $('linkInput').value.length); } catch (e) {}
+      updateLinkActionState();
+      notify('क्लिपबोर्ड का टेक्स्ट पेस्ट हो गया। अब हरे Search बटन पर टैप करें।');
+    } catch(e) {
+      // Browser security blocks scripted clipboard reads on file:// and many Android WebViews.
+      // Focus/select the input so the OS Paste action is available immediately.
+      const input = $('linkInput');
+      input.focus();
+      try { input.select(); input.setSelectionRange(0, input.value.length); } catch (err) {}
+      notify('इस ऐप को क्लिपबोर्ड पढ़ने की अनुमति नहीं मिली। लिंक बार पर लंबा टैप करके Paste चुनें; पेस्ट होते ही बटन Search हो जाएगा।');
+    } finally {
+      button.disabled = false;
+    }
+  });
+  $('linkedVideoGrid').addEventListener('click', async e => {
+    const card = e.target.closest('#linkedVideoCard');
+    if (!card || !linkedMedia) return;
+    await playLinkedVideo(linkedMedia);
+  });
+  $('linkedVideoGrid').addEventListener('keydown', async e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('#linkedVideoCard') && linkedMedia) {
+      e.preventDefault();
+      await playLinkedVideo(linkedMedia);
+    }
+  });
+  $('sortSelect').addEventListener('change',render);
+  $('refreshBtn').addEventListener('click',()=>{render();notify('लाइब्रेरी रीफ्रेश हो गई');});
+  $('videoGrid').addEventListener('click',e=>{
+    const menuBtn=e.target.closest('[data-menu]');
+    if(menuBtn){
+      const id=menuBtn.dataset.menu, menu=$('menu-'+id), opening=!menu.classList.contains('open');
+      document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));
+      document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));
+      if(opening){menu.classList.add('open');menuBtn.setAttribute('aria-expanded','true');}
+      e.stopPropagation(); return;
+    }
+    const b=e.target.closest('[data-play],[data-like],[data-delete],[data-info]');
+    if(!b) { if(e.target.closest('.thumb')) {const id=e.target.closest('.thumb').dataset.play; if(id) playVideo(id);} return; }
+    if(b.dataset.play){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));playVideo(b.dataset.play);}
+    if(b.dataset.like){const v=videos.find(x=>x.id===b.dataset.like);if(v){v.liked=!v.liked;saveRecords();render();notify(v.liked?'Added to Liked videos':'Removed from Liked videos');}}
+    if(b.dataset.info){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));showInfo(b.dataset.info);}
+    if(b.dataset.delete){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));removeVideo(b.dataset.delete);}
+  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.video-menu-wrap')){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));}});
+  $('videoGrid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.thumb')){e.preventDefault();playVideo(e.target.dataset.play);}});
+  $('closePlayerFloat').onclick=e=>{e.stopPropagation();closePlayer();};
+  $('playerOverlay').addEventListener('click',e=>{if(e.target===$('playerOverlay'))closePlayer();});
+  $('closeDetail').onclick=()=>$('detailOverlay').classList.remove('show');
+  $('detailOverlay').addEventListener('click',e=>{if(e.target===$('detailOverlay'))$('detailOverlay').classList.remove('show');});
+  $('homeBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  function openSettings(){ $('settingsOverlay').classList.add('show'); document.body.style.overflow='hidden'; }
+  function closeSettings(){ $('settingsOverlay').classList.remove('show'); $('clearConfirmOverlay').classList.remove('show'); document.body.style.overflow=''; }
+  $('settingsBtn').onclick=openSettings;
+  $('closeSettings').onclick=closeSettings;
+  $('settingsOverlay').addEventListener('click',e=>{if(e.target===$('settingsOverlay'))closeSettings();});
+  $('themeToggle').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+  $('settingsInsertBtn').onclick=()=>{closeSettings();$('videoPicker').click();};
+  $('clearBtn').onclick=()=>{
+    $('clearConfirmInput').value=''; $('clearConfirmError').textContent='';
+    $('clearConfirmInput').removeAttribute('aria-invalid');
+    $('clearConfirmOverlay').classList.add('show');
+    setTimeout(()=>$('clearConfirmInput').focus(),60);
+  };
+  $('cancelClearBtn').onclick=()=>{
+    $('clearConfirmOverlay').classList.remove('show');
+    $('clearConfirmInput').value=''; $('clearConfirmError').textContent='';
+    $('clearConfirmInput').removeAttribute('aria-invalid');
+  };
+  $('clearConfirmInput').addEventListener('input',()=>{$('clearConfirmError').textContent='';$('clearConfirmInput').removeAttribute('aria-invalid');});
+  $('clearConfirmForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    if($('clearConfirmInput').value!=='Delete'){
+      $('clearConfirmError').textContent='गलत टेक्स्ट। डेटा नहीं हटाया गया। बिल्कुल Delete लिखें; कोई स्पेस या दूसरा अक्षर न जोड़ें।';
+      $('clearConfirmInput').setAttribute('aria-invalid','true'); $('clearConfirmInput').focus(); return;
+    }
+    $('confirmClearBtn').disabled=true;
+    try { await clearLibrary(); } finally { $('confirmClearBtn').disabled=false; }
+  });
+  $('clearConfirmOverlay').addEventListener('click',e=>{if(e.target===$('clearConfirmOverlay'))$('cancelClearBtn').click();});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if($('clearConfirmOverlay').classList.contains('show'))$('cancelClearBtn').click();
+      else if($('playerOverlay').classList.contains('show'))closePlayer();
+      else { $('detailOverlay').classList.remove('show'); closeSettings(); }
+    }
+  });
+
+  (async function init(){
+    setTheme(localStorage.getItem('videovault-theme')||'dark');
+    $('volumeFill').style.height='100%'; $('volumeValue').textContent='100%';
+    $('speedValue').textContent='1×';
+    updateLinkActionState();
+    updateSeekVisual();
+    await loadRecords();
+    try { await openDB(); }
+    catch(e) { console.warn('IndexedDB unavailable',e); }
+    render();
+    if (!db) notify('यह ब्राउज़र स्थायी वीडियो स्टोरेज सपोर्ट नहीं कर रहा।');
+  })();
+})();
+</script>
+</body>
+</html>
