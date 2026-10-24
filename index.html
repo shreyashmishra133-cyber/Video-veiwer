@@ -170,6 +170,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
 #playerOverlay .gesture-meter .meter-fill{animation:none!important;background-size:100% 100%;background-position:50% 50%;transition:none}
 #playerOverlay .gesture-meter .meter-track{box-shadow:none}
 #playerOverlay .player-hint{display:none!important}
+#playerOverlay #skipFeedback{display:none!important}
 #playerOverlay .player-bottom{gap:8px}
 #playerOverlay .player-time{text-shadow:0 1px 3px #000}
 #playerOverlay .skip-feedback{box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -185,6 +186,19 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
  #playerOverlay .player-hud-top button{width:40px;height:40px;border-radius:12px}
 }
 @media(prefers-reduced-motion:reduce){#playerOverlay *{animation:none!important;transition:none!important}}
+
+/* Lock + quality controls */
+#playerOverlay .player-top-left{display:flex;align-items:center;gap:8px}
+#playerOverlay .quality-panel{position:absolute;z-index:12;left:10px;top:60px;width:150px;max-height:70%;overflow:auto;padding:10px;border:1px solid #ffffff2b;border-radius:13px;background:rgba(12,16,28,.96);color:#fff;box-shadow:0 8px 28px #0005}
+#playerOverlay .quality-panel[hidden]{display:none!important}
+#playerOverlay .quality-title{font-size:12px;font-weight:700;padding:4px 6px 8px;color:#ddd}
+#playerOverlay .quality-panel button{display:block;width:100%;text-align:left;padding:9px 10px;margin:2px 0;border:0;border-radius:8px;background:transparent;color:#fff}
+#playerOverlay .quality-panel button:active,#playerOverlay .quality-panel button.selected{background:#ffffff20}
+#playerOverlay.locked .player-hud>*:not(.player-hud-top){display:none!important}
+#playerOverlay.locked .player-hud-top button:not(#playerLock){display:none!important}
+#playerOverlay.locked .quality-panel{display:none!important}
+#playerOverlay.locked .player-hud{background:transparent}
+
 /* Full-screen, soft-glass Settings panel */
 .settings-overlay{padding:0;align-items:stretch;justify-content:stretch;background:rgba(6,10,25,.42);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:30}
 .settings-modal{width:100%;height:100vh;height:100dvh;max-height:none;overflow:auto;border:0;border-radius:0;background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--accent) 19%,transparent),transparent 42%),radial-gradient(ellipse at 100% 40%,rgba(225,111,156,.09),transparent 38%),var(--bg);scrollbar-width:thin}
@@ -234,28 +248,6 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
 #playerStage .external-player{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;border:0;background:#000;transform-origin:center center;pointer-events:none}
 #playerStage iframe.external-player{max-width:none}
 @media(max-width:600px){.link-search-wrap{margin:-5px 0 18px;padding-left:12px;border-radius:16px;gap:6px}.link-search-input{font-size:14px}.link-search-action{min-width:76px;padding:8px 11px;border-radius:11px}.link-result-body{padding:10px}}
-
-
-/* Persistent online-video cards and lightweight menu/dialog enhancements */
-.link-result-card{overflow:visible;position:relative}
-.link-result-thumb{border-radius:16px 16px 0 0}
-.link-result-body .video-info-row{align-items:flex-start;gap:6px}
-.link-result-body .link-result-title{flex:1;min-width:0;margin:0 0 5px}
-.link-result-body .video-menu-wrap{margin-top:-5px}
-.link-result-body .video-menu{z-index:12}
-.online-label{display:inline-flex;align-items:center;gap:5px;color:var(--accent2);font-size:11px;font-weight:700}
-.remove-confirm-modal{width:min(390px,100%);padding:22px}
-.remove-confirm-modal .confirm-mark{color:var(--danger)}
-.remove-confirm-modal .confirm-description{overflow-wrap:anywhere}
-/* The seek gesture indicator stays below the existing timeline; the timeline's styling is unchanged. */
-#playerOverlay .skip-scrub-meter{display:flex;align-items:center;width:100%;height:15px;margin:7px 0 1px;padding:0 2px;opacity:.58;transition:opacity .14s ease;pointer-events:none}
-#playerOverlay .skip-scrub-meter.active{opacity:1}
-#playerOverlay .skip-scrub-track{position:relative;width:100%;height:5px;border-radius:999px;background:#ffffff38;border:1px solid #ffffff20;overflow:visible}
-#playerOverlay .skip-scrub-fill{position:absolute;left:var(--skip-fill-left,50%);top:0;width:var(--skip-fill-width,0%);height:100%;border-radius:999px;background:linear-gradient(90deg,#dc2626,#f97316,#fbbf24);}
-#playerOverlay .skip-scrub-thumb{position:absolute;left:var(--skip-pos,50%);top:50%;width:13px;height:13px;transform:translate(-50%,-50%);border:2px solid #fff9;border-radius:50%;background:#fb923c;box-shadow:0 0 0 2px #f9731630;transition:left .08s linear;}
-#playerOverlay .skip-scrub-meter.active .skip-scrub-thumb{transition:none;box-shadow:0 0 0 3px #f9731640}
-#playerOverlay .player-stage{touch-action:none}
-@media(prefers-reduced-motion:reduce){#playerOverlay .skip-scrub-meter,#playerOverlay .skip-scrub-thumb{transition:none!important}}
 
 </style>
 </head>
@@ -320,13 +312,14 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
    <div class="player-stage" id="playerStage">
     <video id="videoPlayer" playsinline preload="metadata"></video>
     <div class="player-dim" id="playerDim"></div>
-    
+    <div class="skip-feedback" id="skipFeedback" aria-hidden="true"><span class="skip-arrow-wrap"><svg viewBox="0 0 24 24" class="skip-arrow" aria-hidden="true"><path d="M3 5.5 9.5 12 3 18.5"/><path d="M10 5.5 16.5 12 10 18.5"/><path d="M16.5 12H21"/></svg></span><span class="skip-copy"><strong id="skipAmount">10 सेकंड</strong><small id="skipDirectionText">आगे</small></span></div>
     <div class="gesture-meter left" id="brightnessMeter"><span class="meter-icon">☀</span><span class="meter-track"><span class="meter-fill" id="brightnessFill"></span></span><span id="brightnessValue">100%</span></div>
     <div class="gesture-meter right" id="volumeMeter"><span class="meter-icon">🔊</span><span class="meter-track"><span class="meter-fill" id="volumeFill"></span></span><span class="meter-value" id="volumeValue">100%</span></div>
     <div class="gesture-meter speed" id="speedMeter"><span class="meter-icon">⏩</span><span class="meter-label">स्पीड</span><span class="meter-value" id="speedValue">1×</span></div>
+    <div class="quality-panel" id="qualityPanel" aria-label="वीडियो क्वालिटी" hidden><div class="quality-title">वीडियो क्वालिटी</div><button data-quality="auto">Auto</button><button data-quality="144p">144p</button><button data-quality="240p">240p</button><button data-quality="360p">360p</button><button data-quality="480p">480p</button><button data-quality="720p">720p</button><button data-quality="1080p">1080p</button></div>
     <div class="player-hud" id="playerHud">
      <div class="player-hud-top">
-      <button id="playerFullscreen" aria-label="फुल स्क्रीन" title="फुल स्क्रीन">⛶</button>
+      <div class="player-top-left"><button id="playerFullscreen" aria-label="फुल स्क्रीन" title="फुल स्क्रीन">⛶</button><button id="playerLock" aria-label="स्क्रीन लॉक करें" title="स्क्रीन लॉक करें">🔓</button><button id="playerQuality" aria-label="वीडियो क्वालिटी" title="वीडियो क्वालिटी">⚙</button></div>
       <button id="closePlayerFloat" aria-label="वीडियो बंद करें" title="वीडियो बंद करें"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
      </div>
      <div class="player-center"><button class="player-toggle is-playing" id="playPauseBtn" aria-label="पॉज़ करें"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.1 5.8Q8.1 4.8 9.1 5.4L18.2 11.4Q19.2 12 18.2 12.6L9.1 18.6Q8.1 19.2 8.1 18.2Z"/></svg></button></div>
@@ -336,8 +329,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
        <input class="player-seek" id="seekSlider" type="range" min="0" max="1000" value="0" aria-label="वीडियो की स्थिति">
        <span class="player-time" id="durationTime">0:00</span>
       </div>
-      <div class="skip-scrub-meter" id="skipScrubMeter" aria-hidden="true"><div class="skip-scrub-track" id="skipScrubTrack"><span class="skip-scrub-fill" id="skipScrubFill"></span><span class="skip-scrub-thumb" id="skipScrubThumb"></span></div></div>
-      <div class="player-hint">नीचे क्षैतिज स्वाइप: 10 सेकंड आगे/पीछे · बाएँ ऊपर/नीचे: ब्राइटनेस · दाएँ ऊपर/नीचे: वॉल्यूम · स्पीड कंट्रोल · पिंच: ज़ूम, ड्रैग: पैन</div>
+      <div class="player-hint">डबल टैप: ±10 सेकंड · नीचे स्वाइप: ±10 सेकंड · बाएँ ऊपर/नीचे: ब्राइटनेस · दाएँ ऊपर/नीचे: वॉल्यूम · ऊपर स्वाइप: स्पीड · पिंच: ज़ूम, ड्रैग: पैन</div>
      </div>
     </div>
    </div>
@@ -385,14 +377,6 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   </form>
  </div>
 </div>
-
-<div class="overlay confirm-overlay" id="removeConfirmOverlay" role="dialog" aria-modal="true" aria-labelledby="removeConfirmTitle" aria-describedby="removeConfirmDescription">
- <div class="modal confirm-modal remove-confirm-modal">
-  <div class="confirm-mark" aria-hidden="true">!</div><h2 id="removeConfirmTitle">Remove Video</h2>
-  <p class="confirm-description" id="removeConfirmDescription">क्या आप इस वीडियो को लाइब्रेरी से हटाना चाहते हैं?</p>
-  <div class="confirm-actions"><button type="button" id="cancelRemoveBtn" class="cancel-action">Cancel</button><button type="button" id="confirmRemoveBtn" class="danger-fill">OK, Remove</button></div>
- </div>
-</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -403,8 +387,6 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   let activeUrl = null;
   let activeExternal = null;
   let linkedMedia = null;
-  let pendingRemoveId = null;
-  let activeRecordId = null;
   let ytPlayer = null;
   let ytState = -1;
   let youtubeApiPromise = null;
@@ -513,31 +495,17 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     const cutoff = Date.now() - 7*86400000;
     $('recentCount').textContent = videos.filter(v=>(v.addedAt||0)>=cutoff).length;
   }
-  function isOnlineRecord(record) {
-    return Boolean(record && record.source === 'url' && record.url && record.kind);
-  }
   function render() {
     stats();
     const q = $('searchInput').value.trim().toLowerCase(), sort = $('sortSelect').value;
-    let list = videos.filter(v => String(v.name || '').toLowerCase().includes(q));
-    list.sort((a,b) => sort==='oldest' ? (a.addedAt||0)-(b.addedAt||0) : sort==='name' ? String(a.name||'').localeCompare(String(b.name||'')) : sort==='size' ? (b.size||0)-(a.size||0) : sort==='duration' ? (b.duration||0)-(a.duration||0) : (b.addedAt||0)-(a.addedAt||0));
+    let list = videos.filter(v => v.name.toLowerCase().includes(q));
+    list.sort((a,b) => sort==='oldest' ? a.addedAt-b.addedAt : sort==='name' ? a.name.localeCompare(b.name) : sort==='size' ? b.size-a.size : sort==='duration' ? b.duration-a.duration : b.addedAt-a.addedAt);
     $('resultLabel').textContent = `${list.length} वीडियो`;
-    $('videoGrid').innerHTML = list.map(v => {
-      const id = esc(v.id), name = esc(v.name || 'वीडियो'), online = isOnlineRecord(v);
-      const thumb = v.thumb
-        ? `<img src="${esc(v.thumb)}" alt="${name} का थंबनेल" loading="lazy" referrerpolicy="no-referrer">`
-        : `<span style="font-size:38px">${online ? '🎬' : '🎞️'}</span>`;
-      const menu = online
-        ? `<button data-play="${id}">▶ &nbsp; Play Video</button><button data-save="${id}">▣ &nbsp; Save Video</button><button class="danger" data-delete="${id}">▱ &nbsp; Remove Video</button>`
-        : `<button data-play="${id}">▶ &nbsp; Play Video</button><button data-save="${id}">▣ &nbsp; Save Video</button><button class="${v.liked ? 'liked' : ''}" data-like="${id}">${v.liked ? '♥' : '♡'} &nbsp; ${v.liked ? 'Liked' : 'Like'}</button><button data-info="${id}">ⓘ &nbsp; Information</button><button class="danger" data-delete="${id}">▱ &nbsp; Remove Video</button>`;
-      const leftMeta = online ? esc(v.host || 'Online video') : fmtBytes(v.size);
-      const rightMeta = online ? 'URL वीडियो' : (v.width&&v.height ? `${v.width}×${v.height}` : 'वीडियो');
-      const duration = online ? '<span class="duration">URL</span>' : `<span class="duration">${fmtDuration(v.duration)}</span>`;
-      return `<article class="video-card">
-        <div class="thumb" data-play="${id}" role="button" tabindex="0" aria-label="${name} चलाएँ">${thumb}<button class="play" data-play="${id}" aria-label="वीडियो चलाएँ">▶</button>${duration}</div>
-        <div class="card-body"><div class="video-info-row"><div class="video-title" title="${name}">${name}</div><div class="video-menu-wrap"><button class="video-menu-btn" data-menu="${id}" aria-label="वीडियो विकल्प" aria-expanded="false">⋮</button><div class="video-menu" id="menu-${id}">${menu}</div></div></div><div class="meta"><span>${leftMeta}</span><span>${rightMeta}</span></div></div>
-      </article>`;
-    }).join('');
+    $('videoGrid').innerHTML = list.map(v => `
+      <article class="video-card">
+        <div class="thumb" data-play="${v.id}" role="button" tabindex="0" aria-label="${esc(v.name)} चलाएँ">${v.thumb ? `<img src="${v.thumb}" alt="${esc(v.name)} का थंबनेल">` : '<span style="font-size:38px">🎞️</span>'}<button class="play" data-play="${v.id}" aria-label="वीडियो चलाएँ">▶</button><span class="duration">${fmtDuration(v.duration)}</span></div>
+        <div class="card-body"><div class="video-info-row"><div class="video-title" title="${esc(v.name)}">${esc(v.name)}</div><div class="video-menu-wrap"><button class="video-menu-btn" data-menu="${v.id}" aria-label="वीडियो विकल्प" aria-expanded="false">⋮</button><div class="video-menu" id="menu-${v.id}"><button data-play="${v.id}">▶ &nbsp; Play</button><button class="${v.liked ? 'liked' : ''}" data-like="${v.id}">${v.liked ? '♥' : '♡'} &nbsp; ${v.liked ? 'Liked' : 'Like'}</button><button data-info="${v.id}">ⓘ &nbsp; Information</button><button class="danger" data-delete="${v.id}">▱ &nbsp; Remove</button></div></div></div><div class="meta"><span>${fmtBytes(v.size)}</span><span>${v.width&&v.height ? `${v.width}×${v.height}` : 'वीडियो'}</span></div></div>
+      </article>`).join('');
     $('emptyState').classList.toggle('hidden', list.length !== 0);
     if (!videos.length) { $('emptyTitle').textContent = 'आपकी लाइब्रेरी अभी खाली है'; $('emptyText').textContent = 'अपनी डिवाइस से वीडियो चुनें। इस ब्राउज़र में उपलब्ध स्टोरेज के अनुसार वीडियो सेव होंगे।'; }
     else { $('emptyTitle').textContent = 'कोई वीडियो नहीं मिला'; $('emptyText').textContent = 'दूसरा नाम खोजें या सर्च बॉक्स साफ़ करें।'; }
@@ -612,44 +580,6 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     return {kind:'platform', platform:host, url:url.href, host:host, title:'वेब वीडियो लिंक', thumbnail:'', note:'यह सामान्य वेब/सोशल लिंक है, सीधा वीडियो फ़ाइल लिंक नहीं। साइट के embed प्रतिबंधों के कारण इसका playback VideoVault के सभी custom controls से नियंत्रित नहीं हो सकता।'};
   }
 
-  function saveLinkedMedia(info) {
-    let record = videos.find(v => isOnlineRecord(v) && (
-      (info.kind === 'youtube' && info.id && v.youtubeId === info.id) ||
-      (info.kind !== 'youtube' && v.url === info.url)
-    ));
-    if (record) {
-      record.url = info.url;
-      record.kind = info.kind;
-      record.youtubeId = info.id || record.youtubeId || '';
-      record.host = info.host || record.host || 'Online video';
-      record.thumb = record.thumb || info.thumbnail || '';
-      record.note = info.note || record.note || '';
-      record.type = `URL · ${info.kind}`;
-      saveRecords();
-      render();
-      return record;
-    }
-    const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now()+'-'+Math.random().toString(16).slice(2));
-    record = {
-      id, source:'url', kind:info.kind, url:info.url, youtubeId:info.id || '',
-      host:info.host || 'Online video', note:info.note || '',
-      name:info.title || info.host || 'Online video', originalName:info.title || info.host || 'Online video',
-      type:`URL · ${info.kind}`, size:0, duration:0, width:0, height:0,
-      thumb:info.thumbnail || '', addedAt:Date.now()
-    };
-    videos.unshift(record);
-    saveRecords();
-    render();
-    return record;
-  }
-  function linkedInfoFromRecord(record) {
-    return {
-      kind:record.kind, id:record.youtubeId || '', url:record.url,
-      host:record.host || 'Online video', title:record.name || 'Online video',
-      thumbnail:record.thumb || '', note:record.note || '', recordId:record.id
-    };
-  }
-
   function updateLinkActionState() {
     const hasText = Boolean($('linkInput').value.trim());
     const button = $('linkActionBtn');
@@ -702,12 +632,12 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   }
 
   function showPlayerShell(title) {
+    setPlayerLocked(false);
     $('playerStage').style.width = '';
     $('playerStage').style.height = '';
     $('playerStage').style.aspectRatio = '16 / 9';
     $('seekSlider').value = '0';
     updateSeekVisual();
-    resetSkipScrub(0);
     const playerTitle = $('playerTitle');
     if (playerTitle) playerTitle.textContent = title || 'वीडियो';
     playerBrightness = 1; playerZoom = 1; playerPanX = 0; playerPanY = 0;
@@ -722,8 +652,8 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     showHud();
   }
 
-  function showLinkedResult(info, recordId) {
-    linkedMedia = {...info, recordId};
+  function showLinkedResult(info) {
+    linkedMedia = info;
     $('linkResultSection').classList.remove('hidden');
     $('linkResultStatus').textContent = info.host || 'लिंक';
     const thumb = info.thumbnail
@@ -733,32 +663,23 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     const note = info.kind === 'platform'
       ? `${info.note} इस लिंक से असली वीडियो फ़ाइल उपलब्ध न होने पर इसे मूल प्लेटफ़ॉर्म में खोलना पड़ेगा।`
       : (info.kind === 'youtube'
-          ? 'वीडियो लाइब्रेरी में सेव है। चलाने के लिए कार्ड पर टैप करें।'
-          : info.note + ' चलाने के लिए कार्ड पर टैप करें।');
-    const safeId = esc(recordId);
-    $('linkedVideoGrid').innerHTML = `<article class="link-result-card" id="linkedVideoCard" aria-label="${esc(info.title)}">
-      <div class="link-result-thumb" data-linked-play="${safeId}" role="button" tabindex="0" aria-label="${esc(info.title)} चलाएँ">${thumb}<div class="link-thumb-overlay"><span>▶</span></div></div>
-      <div class="link-result-body">
-       <div class="video-info-row"><h3 class="link-result-title">${esc(info.title)}</h3><div class="video-menu-wrap"><button class="video-menu-btn" data-menu="link-${safeId}" aria-label="वीडियो विकल्प" aria-expanded="false">⋮</button><div class="video-menu" id="menu-link-${safeId}"><button data-play="${safeId}">▶ &nbsp; Play Video</button><button data-save="${safeId}">▣ &nbsp; Save Video</button><button class="danger" data-delete="${safeId}">▱ &nbsp; Remove Video</button></div></div></div>
-       <div class="meta"><span>${esc(badge)}</span><span class="online-label">✓ लाइब्रेरी में सेव</span></div>
-       <p class="link-result-note">${esc(note)}</p>
-      </div>
-     </article>`;
+          ? 'चलाने के लिए कार्ड पर कहीं भी टैप करें। उपलब्ध app controls इसी player से काम करेंगे।'
+          : info.note + ' चलाने के लिए कार्ड पर कहीं भी टैप करें।');
+    $('linkedVideoGrid').innerHTML = `<article class="link-result-card" id="linkedVideoCard" role="button" tabindex="0" aria-label="${esc(info.title)} चलाएँ"><div class="link-result-thumb">${thumb}<div class="link-thumb-overlay"><span>▶</span></div></div><div class="link-result-body"><h3 class="link-result-title">${esc(info.title)}</h3><div class="meta"><span>${esc(badge)}</span><span>कार्ड टैप करें ▶</span></div><p class="link-result-note">${esc(note)}</p></div></article>`;
   }
+
   async function searchLinkedUrl() {
     const raw = $('linkInput').value.trim();
     const info = parseLinkedMedia(raw);
     if (!info) { notify('कृपया सही http/https वीडियो या सोशल मीडिया लिंक डालें।'); return; }
-    const record = saveLinkedMedia(info);
-    showLinkedResult(info, record.id);
+    showLinkedResult(info);
     if (info.kind === 'youtube') loadYouTubeApi().catch(() => {});
-    if (info.kind === 'platform') notify('लिंक लाइब्रेरी में सेव है। इस प्लेटफ़ॉर्म के playback प्रतिबंध लागू हो सकते हैं।');
-    else notify('लिंक लाइब्रेरी में सेव है। वीडियो चलाने के लिए कार्ड पर टैप करें।');
+    if (info.kind === 'youtube' || info.kind === 'direct') notify('लिंक मिल गया। वीडियो चलाने के लिए कार्ड पर कहीं भी टैप करें।');
+    else notify('लिंक मिल गया। इस प्लेटफ़ॉर्म के playback प्रतिबंध लागू हो सकते हैं।');
   }
 
   async function playLinkedVideo(info) {
     if (!info) return;
-    activeRecordId = info.recordId || null;
     if (info.kind === 'platform') {
       // A normal social-page URL is not a media stream. A static HTML file cannot bypass
       // platform DRM/embed rules, so use the original page as a transparent fallback.
@@ -799,7 +720,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     try {
       const api = await loadYouTubeApi();
       if (!activeExternal || activeExternal.kind !== 'youtube' || activeExternal.id !== info.id) return;
-      const playerVars = {autoplay:1, controls:0, disablekb:1, fs:0, rel:0, playsinline:1, iv_load_policy:3, enablejsapi:1};
+      const playerVars = {autoplay:1, controls:0, disablekb:1, fs:0, modestbranding:1, rel:0, playsinline:1, iv_load_policy:3, enablejsapi:1};
       // YouTube requires a real web origin/referrer in many WebView deployments. Never pass the literal "null" origin from file://.
       if (location.origin && /^https?:\/\//i.test(location.origin)) { playerVars.origin = location.origin; playerVars.widget_referrer = location.href; }
       ytPlayer = new api.Player(host, {
@@ -883,13 +804,6 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
 
   async function playVideo(id) {
     const record = videos.find(v=>v.id===id); if (!record) return;
-    if (isOnlineRecord(record)) {
-      record.lastPlayedAt = Date.now();
-      saveRecords(); render();
-      await playLinkedVideo(linkedInfoFromRecord(record));
-      return;
-    }
-    activeRecordId = id;
     disposeExternalPlayer();
     $('videoPlayer').style.display = 'block';
     try {
@@ -914,6 +828,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     } catch(e) { notify('वीडियो खोला नहीं जा सका।'); }
   }
   function closePlayer() {
+    setPlayerLocked(false); $('qualityPanel').hidden=true;
     const stage = $('playerStage');
     if ((document.fullscreenElement === stage) && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
     else if (document.webkitFullscreenElement === stage && document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -929,14 +844,13 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     document.body.style.overflow='';
     $('playerHud').classList.remove('hud-hidden');
     if (activeUrl) { URL.revokeObjectURL(activeUrl); activeUrl=null; }
-    activeRecordId = null;
     $('videoPlayer').style.display = 'block';
   }
   function showInfo(id) {
     const v = videos.find(x=>x.id===id); if (!v) return;
     $('detailContent').innerHTML = `<div class="detail-grid">
-      <div>वीडियो नाम</div><div>${esc(v.name)}</div><div>${isOnlineRecord(v) ? 'वीडियो लिंक' : 'फ़ाइल नाम'}</div><div>${isOnlineRecord(v) ? esc(v.url) : esc(v.originalName||v.name)}</div>
-      <div>साइज़</div><div>${isOnlineRecord(v) ? 'ऑनलाइन लिंक' : `${fmtBytes(v.size)} (${((v.size||0)/1048576).toFixed(2)} MB)`}</div>
+      <div>वीडियो नाम</div><div>${esc(v.name)}</div><div>फ़ाइल नाम</div><div>${esc(v.originalName||v.name)}</div>
+      <div>साइज़</div><div>${fmtBytes(v.size)} (${((v.size||0)/1048576).toFixed(2)} MB)</div>
       <div>अवधि</div><div>${fmtDuration(v.duration)}</div><div>रिज़ॉल्यूशन</div><div>${v.width&&v.height ? `${v.width} × ${v.height}` : 'उपलब्ध नहीं'}</div>
       <div>फ़ॉर्मेट</div><div>${esc(v.type||'अज्ञात')}</div><div>अपलोड/जोड़ा गया</div><div>${v.addedAt ? new Date(v.addedAt).toLocaleString('hi-IN') : 'उपलब्ध नहीं'}</div>
       <div>आख़िरी बार चलाया</div><div>${v.lastPlayedAt ? new Date(v.lastPlayedAt).toLocaleString('hi-IN') : 'अभी तक नहीं चलाया'}</div>
@@ -948,29 +862,11 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
       if (next && next.trim()) { v.name=next.trim(); saveRecords(); render(); showInfo(id); notify('डिस्प्ले नाम बदल दिया गया'); }
     };
   }
-  function requestRemoveVideo(id) {
-    const v = videos.find(x=>x.id===id);
-    if (!v) return;
-    closeVideoMenus();
-    pendingRemoveId = id;
-    $('removeConfirmDescription').textContent = `क्या आप “${v.name}” को अपनी लाइब्रेरी से हटाना चाहते हैं? Cancel करने पर वीडियो सेव रहेगा।`;
-    $('removeConfirmOverlay').classList.add('show');
-  }
   async function removeVideo(id) {
     const v = videos.find(x=>x.id===id); if (!v) return;
-    if (activeRecordId === id) closePlayer();
-    try { if (db && !isOnlineRecord(v)) await deleteFile(id); } catch(e) {}
-    videos = videos.filter(x=>x.id!==id);
-    const persisted = saveRecords();
-    if (linkedMedia && linkedMedia.recordId === id) {
-      linkedMedia = null;
-      $('linkResultSection').classList.add('hidden');
-      $('linkedVideoGrid').innerHTML = '';
-    }
-    render();
-    $('removeConfirmOverlay').classList.remove('show');
-    pendingRemoveId = null;
-    if (persisted) notify('वीडियो लाइब्रेरी से हटा दिया गया');
+    if (!confirm(`क्या आप इस वीडियो को लाइब्रेरी से हटाना चाहते हैं?\n\n${v.name}\n\nOK = हटाएँ · Cancel = रद्द करें`)) return;
+    try { if (db) await deleteFile(id); } catch(e) {}
+    videos = videos.filter(x=>x.id!==id); saveRecords(); render(); notify('वीडियो लाइब्रेरी से हटा दिया गया');
   }
   function setTheme(theme) {
     const normalized = theme === 'light' ? 'light' : 'dark';
@@ -1035,7 +931,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   // Brightness is simulated because web pages cannot directly set hardware screen brightness.
   let playerBrightness = 1, playerZoom = 1, playerPanX = 0, playerPanY = 0;
   let hudTimer = null, gestureTimer = null, gestureStart = null, holdTimer = null;
-  let touchPoints = new Map(), pinchStart = null;
+  let touchPoints = new Map(), pinchStart = null, lastTapAt = 0, lastTapX = 0, lastTapY = 0;
   let suppressClickUntil = 0, isSeeking = false;
 
   function applyPlayerBrightness() {
@@ -1076,38 +972,32 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     const value = Math.max(0, Math.min(max, Number(slider.value) || 0));
     slider.style.setProperty('--progress', (value / max * 100) + '%');
   }
-  let skipScrubResetTimer = null;
-  function moveSkipScrub(dx, stageWidth) {
-    const position = Math.max(2, Math.min(98, 50 + (dx / Math.max(1, stageWidth)) * 100));
-    const left = Math.min(50, position), width = Math.abs(position - 50);
-    $('skipScrubTrack').style.setProperty('--skip-pos', position + '%');
-    $('skipScrubTrack').style.setProperty('--skip-fill-left', left + '%');
-    $('skipScrubTrack').style.setProperty('--skip-fill-width', width + '%');
-    $('skipScrubMeter').classList.add('active');
-    clearTimeout(skipScrubResetTimer);
-    showHud();
+  let skipFeedbackTimer = null;
+  function showSkipFeedback(direction, x, y) {
+    const stage = $('playerStage');
+    const feedback = $('skipFeedback');
+    const rect = stage.getBoundingClientRect();
+    const px = Math.max(14, Math.min(86, ((x - rect.left) / rect.width) * 100));
+    const py = Math.max(17, Math.min(83, ((y - rect.top) / rect.height) * 100));
+    feedback.style.left = px + '%';
+    feedback.style.top = py + '%';
+    feedback.classList.toggle('backward', direction < 0);
+    $('skipDirectionText').textContent = direction > 0 ? 'आगे' : 'पीछे';
+    $('skipAmount').textContent = '10 सेकंड';
+    feedback.classList.add('show');
+    clearTimeout(skipFeedbackTimer);
+    skipFeedbackTimer = setTimeout(() => feedback.classList.remove('show'), 1000);
   }
-  function resetSkipScrub(delay=500) {
-    clearTimeout(skipScrubResetTimer);
-    skipScrubResetTimer = setTimeout(() => {
-      const track = $('skipScrubTrack');
-      track.style.setProperty('--skip-pos', '50%');
-      track.style.setProperty('--skip-fill-left', '50%');
-      track.style.setProperty('--skip-fill-width', '0%');
-      $('skipScrubMeter').classList.remove('active');
-    }, delay);
-  }
-  function skipByGesture(direction) {
+  function skipByGesture(direction, x, y) {
     const duration = getMediaDuration(), current = getMediaTime();
-    if (!Number.isFinite(duration) || duration <= 0) { resetSkipScrub(180); return; }
-    const target = Math.max(0, Math.min(duration, current + (direction > 0 ? 10 : -10)));
-    setMediaTime(target);
-    $('seekSlider').value = String(Math.round(target / duration * 1000));
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    setMediaTime(Math.max(0, Math.min(duration, current + (direction > 0 ? 10 : -10))));
     updateSeekVisual();
-    if (isYouTubeActive()) updateExternalPlayerUi();
-    showHud();
+    // Keep the feedback clean: hide the timeline and player HUD while the one-second skip cue is shown.
+    clearTimeout(hudTimer);
+    $('playerHud').classList.add('hud-hidden');
+    $('skipFeedback').classList.remove('show');
     suppressClickUntil = Date.now() + 450;
-    resetSkipScrub(520);
   }
   function formatRate(rate) {
     return `${Number(rate.toFixed(2)).toString()}×`;
@@ -1117,6 +1007,43 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
     clearTimeout(hudTimer);
     hudTimer=setTimeout(()=> $('playerHud').classList.add('hud-hidden'), 3000);
   }
+  let playerLocked = false;
+  function setPlayerLocked(locked){
+    playerLocked=!!locked;
+    $('playerOverlay').classList.toggle('locked',playerLocked);
+    $('playerLock').textContent=playerLocked?'🔒':'🔓';
+    $('playerLock').title=playerLocked?'स्क्रीन अनलॉक करें':'स्क्रीन लॉक करें';
+    $('playerLock').setAttribute('aria-label',playerLocked?'स्क्रीन अनलॉक करें':'स्क्रीन लॉक करें');
+    $('qualityPanel').hidden=true;
+    if(playerLocked) $('playerHud').classList.remove('hud-hidden');
+    else showHud();
+  }
+  $('playerLock').addEventListener('click',e=>{e.stopPropagation();setPlayerLocked(!playerLocked);});
+  $('playerQuality').addEventListener('click',e=>{
+    e.stopPropagation(); if(playerLocked) return;
+    $('qualityPanel').hidden=!$('qualityPanel').hidden;
+  });
+  $('qualityPanel').addEventListener('click',e=>{
+    const b=e.target.closest('[data-quality]'); if(!b) return;
+    const quality=b.dataset.quality;
+    $('qualityPanel').querySelectorAll('button').forEach(x=>x.classList.toggle('selected',x===b));
+    if(isYouTubeActive() && ytPlayer && quality!=='auto'){
+      const map={'144p':'small','240p':'small','360p':'medium','480p':'large','720p':'hd720','1080p':'hd1080'};
+      try { if(typeof ytPlayer.setPlaybackQuality==='function') ytPlayer.setPlaybackQuality(map[quality]||'default'); } catch(err) {}
+      notify('क्वालिटी अनुरोध: '+quality+' (YouTube इसे अपने-आप बदल सकता है)।');
+    } else if(isYouTubeActive() && ytPlayer){
+      try { if(typeof ytPlayer.setPlaybackQuality==='function') ytPlayer.setPlaybackQuality('default'); } catch(err) {}
+      notify('क्वालिटी Auto पर अनुरोध की गई।');
+    } else { notify('यह क्वालिटी विकल्प इस वीडियो स्रोत पर उपलब्ध नहीं है।'); }
+    $('qualityPanel').hidden=true;
+  });
+  $('playerStage').addEventListener('click',e=>{
+    if(!playerLocked) return;
+    if(e.target.closest('#playerLock')) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    $('playerHud').classList.remove('hud-hidden');
+  },true);
+
   function meterFor(side) {
     return $(side==='left'?'brightnessMeter':side==='right'?'volumeMeter':'speedMeter');
   }
@@ -1218,16 +1145,29 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   document.addEventListener('webkitfullscreenchange',()=>{
     if (document.webkitFullscreenElement !== $('playerStage')) $('playerStage').classList.remove('force-landscape');
   });
+  let singleTapTimer = null;
   $('playerStage').addEventListener('click',e=>{
     if(Date.now()<suppressClickUntil) return;
     if(e.target.closest('button,input,label')) return;
-    // A tap only toggles the controls. Seeking is handled by horizontal swipe below the video.
-    const hud=$('playerHud');
-    if(hud.classList.contains('hud-hidden')) showHud();
-    else { clearTimeout(hudTimer); hud.classList.add('hud-hidden'); }
+    const now = Date.now();
+    const dx = e.clientX - lastTapX, dy = e.clientY - lastTapY;
+    if(playerLocked){ $('playerHud').classList.remove('hud-hidden'); return; }
+    if(lastTapAt && now-lastTapAt < 310 && Math.hypot(dx,dy) < 70){
+      clearTimeout(singleTapTimer); lastTapAt = 0; return;
+    }
+    lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
+    clearTimeout(singleTapTimer);
+    singleTapTimer = setTimeout(()=>{
+      lastTapAt = 0;
+      // Single tap reveals/hides HUD; playback changes through the play/pause button.
+      const hud=$('playerHud');
+      if(hud.classList.contains('hud-hidden')) showHud();
+      else { clearTimeout(hudTimer); hud.classList.add('hud-hidden'); }
+    }, 310);
   });
 
   function beginPointerGesture(e) {
+    if(playerLocked) { e.preventDefault(); return; }
     const stage = $('playerStage');
     const rect = stage.getBoundingClientRect();
     const point = {x:e.clientX, y:e.clientY, type:e.pointerType};
@@ -1312,8 +1252,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
       applyPlayerZoom();
       suppressClickUntil=Date.now()+500;
     } else if(gestureStart.mode==='skip'){
-      // Show the small scrub marker moving with the finger; commit one 10-second seek on release.
-      moveSkipScrub(dx, rect.width);
+      // Do the seek on pointerup once, so one swipe always means exactly ten seconds.
       suppressClickUntil=Date.now()+500;
     } else if(gestureStart.mode==='speed'){
       // Horizontal swipe: left-to-right increases speed; right-to-left decreases it.
@@ -1349,8 +1288,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
       if(finished.longPress){ setSpeed(finished.rate); }
       if(finished.mode==='skip' && finished.moved && e){
         const dx = e.clientX - finished.x;
-        if(Math.abs(dx) >= 36) skipByGesture(dx > 0 ? 1 : -1);
-        else resetSkipScrub(180);
+        if(Math.abs(dx) >= 36) skipByGesture(dx > 0 ? 1 : -1, finished.x, finished.y);
       }
       if(finished.moved) suppressClickUntil=Date.now()+380;
       gestureStart=null;
@@ -1432,80 +1370,39 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
       button.disabled = false;
     }
   });
-  function closeVideoMenus() {
-    document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));
-    document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));
-  }
-  function toggleVideoMenu(menuBtn) {
-    const menu = $('menu-' + menuBtn.dataset.menu);
-    if (!menu) return;
-    const opening = !menu.classList.contains('open');
-    closeVideoMenus();
-    if (opening) { menu.classList.add('open'); menuBtn.setAttribute('aria-expanded','true'); }
-  }
-  function handleVideoActions(e) {
-    const menuBtn = e.target.closest('[data-menu]');
-    if (menuBtn) { toggleVideoMenu(menuBtn); e.stopPropagation(); return true; }
-    const b = e.target.closest('[data-play],[data-save],[data-like],[data-delete],[data-info]');
-    if (!b) return false;
-    if (b.dataset.play) { closeVideoMenus(); playVideo(b.dataset.play); }
-    if (b.dataset.save) { closeVideoMenus(); saveVideoRecord(b.dataset.save); }
-    if (b.dataset.like) {
-      const v=videos.find(x=>x.id===b.dataset.like);
-      if(v){v.liked=!v.liked;saveRecords();render();notify(v.liked?'Added to Liked videos':'Removed from Liked videos');}
-      closeVideoMenus();
-    }
-    if (b.dataset.info) { closeVideoMenus(); showInfo(b.dataset.info); }
-    if (b.dataset.delete) { requestRemoveVideo(b.dataset.delete); }
-    e.stopPropagation();
-    return true;
-  }
-  function saveVideoRecord(id) {
-    const record = videos.find(v=>v.id===id);
-    if (!record) return;
-    // URL results are persisted at search time; local files are persisted at import time.
-    record.savedAt = record.savedAt || Date.now();
-    if (saveRecords()) {
-      render();
-      notify('वीडियो आपकी लाइब्रेरी में सेव है');
-    }
-  }
   $('linkedVideoGrid').addEventListener('click', async e => {
-    if (handleVideoActions(e)) return;
-    const playTarget = e.target.closest('[data-linked-play]');
-    if (playTarget && linkedMedia) { await playVideo(playTarget.dataset.linkedPlay); return; }
-    if (e.target.closest('#linkedVideoCard') && linkedMedia) await playVideo(linkedMedia.recordId);
+    const card = e.target.closest('#linkedVideoCard');
+    if (!card || !linkedMedia) return;
+    await playLinkedVideo(linkedMedia);
   });
   $('linkedVideoGrid').addEventListener('keydown', async e => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-linked-play]') && linkedMedia) {
-      e.preventDefault(); await playVideo(linkedMedia.recordId);
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('#linkedVideoCard') && linkedMedia) {
+      e.preventDefault();
+      await playLinkedVideo(linkedMedia);
     }
   });
   $('sortSelect').addEventListener('change',render);
   $('refreshBtn').addEventListener('click',()=>{render();notify('लाइब्रेरी रीफ्रेश हो गई');});
   $('videoGrid').addEventListener('click',e=>{
-    if (handleVideoActions(e)) return;
-    const thumb=e.target.closest('.thumb');
-    if(thumb && thumb.dataset.play) playVideo(thumb.dataset.play);
+    const menuBtn=e.target.closest('[data-menu]');
+    if(menuBtn){
+      const id=menuBtn.dataset.menu, menu=$('menu-'+id), opening=!menu.classList.contains('open');
+      document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));
+      document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));
+      if(opening){menu.classList.add('open');menuBtn.setAttribute('aria-expanded','true');}
+      e.stopPropagation(); return;
+    }
+    const b=e.target.closest('[data-play],[data-like],[data-delete],[data-info]');
+    if(!b) { if(e.target.closest('.thumb')) {const id=e.target.closest('.thumb').dataset.play; if(id) playVideo(id);} return; }
+    if(b.dataset.play){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));playVideo(b.dataset.play);}
+    if(b.dataset.like){const v=videos.find(x=>x.id===b.dataset.like);if(v){v.liked=!v.liked;saveRecords();render();notify(v.liked?'Added to Liked videos':'Removed from Liked videos');}}
+    if(b.dataset.info){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));showInfo(b.dataset.info);}
+    if(b.dataset.delete){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));removeVideo(b.dataset.delete);}
   });
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('.video-menu-wrap')) closeVideoMenus();
-  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.video-menu-wrap')){document.querySelectorAll('.video-menu.open').forEach(m=>m.classList.remove('open'));document.querySelectorAll('[data-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));}});
   $('videoGrid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.thumb')){e.preventDefault();playVideo(e.target.dataset.play);}});
   $('closePlayerFloat').onclick=e=>{e.stopPropagation();closePlayer();};
   $('playerOverlay').addEventListener('click',e=>{if(e.target===$('playerOverlay'))closePlayer();});
-  $('cancelRemoveBtn').onclick=()=>{
-    $('removeConfirmOverlay').classList.remove('show');
-    pendingRemoveId = null;
-  };
-  $('confirmRemoveBtn').onclick=async()=>{
-    if (!pendingRemoveId) { $('removeConfirmOverlay').classList.remove('show'); return; }
-    const id = pendingRemoveId;
-    $('confirmRemoveBtn').disabled = true;
-    try { await removeVideo(id); }
-    finally { $('confirmRemoveBtn').disabled = false; }
-  };
-  $('removeConfirmOverlay').addEventListener('click',e=>{if(e.target===$('removeConfirmOverlay'))$('cancelRemoveBtn').click();});
   $('closeDetail').onclick=()=>$('detailOverlay').classList.remove('show');
   $('detailOverlay').addEventListener('click',e=>{if(e.target===$('detailOverlay'))$('detailOverlay').classList.remove('show');});
   $('homeBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
@@ -1540,8 +1437,7 @@ h1{font-size:clamp(20px,5vw,25px);letter-spacing:-.5px}
   $('clearConfirmOverlay').addEventListener('click',e=>{if(e.target===$('clearConfirmOverlay'))$('cancelClearBtn').click();});
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
-      if($('removeConfirmOverlay').classList.contains('show'))$('cancelRemoveBtn').click();
-      else if($('clearConfirmOverlay').classList.contains('show'))$('cancelClearBtn').click();
+      if($('clearConfirmOverlay').classList.contains('show'))$('cancelClearBtn').click();
       else if($('playerOverlay').classList.contains('show'))closePlayer();
       else { $('detailOverlay').classList.remove('show'); closeSettings(); }
     }
